@@ -1,0 +1,68 @@
+# Render Environment Variables — Copy Paste Cheat Sheet
+
+## Render pe "Add Environment Variable" button click karo
+## Har variable ke liye: Key (left box) + Value (right box) daalo
+
+---
+
+### Variable 1
+Key:   APP_LATEST_VERSION
+Value: 1.0.0
+
+### Variable 2
+Key:   APP_MIN_VERSION
+Value: 1.0.0
+
+### Variable 3
+Key:   FREE_ENTITLEMENT
+Value: true
+
+### Variable 4
+Key:   KEY_PREFIX
+Value: pro_
+
+### Variable 5
+Key:   AGORA_APP_ID
+Value: 84c95fd2496e403ab14776f5c74a08ca
+
+### Variable 6
+Key:   AGORA_APP_CERTIFICATE
+Value: efd9bd2ff054416caf3bcfcfcd1c3c2a
+
+### Variable 7
+Key:   TENCENT_SDK_APP_ID
+Value: 1721000587
+
+### Variable 8
+Key:   APP_SIGNING_SECRET
+Value: 8deb16b5e6ea641ae37e3b48e63328acdd7e073de2f13c487204eb5f507a4834
+
+### Variable 9
+Key:   ENTITLEMENT_PUBLIC_KEY_HEX
+Value: ff2f8a41056ea4430ecdcb16ca96d08bd4886098836a3774d36dc82b619abf83
+
+### Variable 10
+Key:   ENTITLEMENT_PRIVATE_KEY_HEX
+Value: 8dd2f1ff335a5e8266272be69b47ba82956d8ab0c368493a063b70574914c0feff2f8a41056ea4430ecdcb16ca96d08bd4886098836a3774d36dc82b619abf83
+
+### Variable 11
+Key:   TENCENT_MSG_KEY
+Value: cfe996c39df1063cee7111e3aab043e1c295dede59d74f4639df5b279045c816
+
+### Variable 12
+Key:   ADMIN_USERNAME
+Value: ASY404
+
+### Variable 13
+Key:   ADMIN_PASSWORD
+Value: Asy404@Pro2024
+
+---
+
+## Notes:
+- Variable 13 (ADMIN_PASSWORD): "Asy404@Pro2024" default hai
+  - Aap apna password daal sakte ho, yaad rakhna
+- Total 13 variables hain — sab add karne ke baad "Create Web Service" click karo
+- Deploy hone ke baad URL milega (jaise https://talkinpro-server.onrender.com)
+- Check karo: URL/health → {"status":"healthy"}
+- Admin panel: URL/admin/login → Username=ASY404, Password=jo set kiya

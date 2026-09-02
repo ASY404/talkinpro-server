@@ -360,7 +360,7 @@ app.get('/v1/session/entitlement', (req, res) => {
 /**
  * POST /v1/session/key
  * Activate a license key.
- * Body: { key: "pro_xxxx", device_id: "..." }
+ * Body: { key: "talkpro_xxxx", device_id: "..." }
  */
 app.post('/v1/session/key', (req, res) => {
   const { key, device_id } = req.body;
@@ -372,36 +372,61 @@ app.post('/v1/session/key', (req, res) => {
   const deviceId = device_id || generateDeviceId(req);
   const device = getOrCreateDevice(deviceId);
 
-  // Simple key validation: keys starting with our prefix are accepted.
-  // For production, you'd validate against a database of issued keys.
-  if (key.startsWith(config.keyPrefix)) {
-    const keyState = {
+  // Key validation: accept keys starting with our prefix OR legacy prefixes.
+  // Also check the license-key database (admin-generated keys) for full validation.
+  const acceptedPrefixes = [config.keyPrefix, 'talkpro_', 'pro_', 'fool403_'].filter(Boolean);
+  const prefixMatches = acceptedPrefixes.some(p => key.startsWith(p));
+
+  // Build the standard premium entitlement response
+  const buildEntitlement = (deviceId, expiresAt, planId) => ({
+    key_state: {
       key_id: key,
       state: 'active',
       maxAccounts: 100,
       features: ALL_FEATURES,
-      expiresAt: null,
-      planId: 'premium',
+      expiresAt: expiresAt || null,
+      planId: planId || 'premium',
       activatedAt: new Date().toISOString(),
-    };
-    device.keyState = keyState;
-    keys.set(key, keyState);
+    },
+    entitlement: {
+      features: ALL_FEATURES,
+      max_accounts: 100,
+      max_accounts_ceiling: 100,
+      voice_config: VOICE_CONFIG,
+      expires_at: expiresAt || null,
+      plan_id: planId || 'premium',
+      device_id: deviceId,
+      has_key: true,
+      key_type: 'premium',
+      checked_at: new Date().toISOString(),
+    },
+  });
 
-    jsonOk(res, {
-      key_state: keyState,
-      entitlement: {
-        features: ALL_FEATURES,
-        max_accounts: 100,
-        max_accounts_ceiling: 100,
-        voice_config: VOICE_CONFIG,
-        expires_at: null,
-        plan_id: 'premium',
-        device_id: deviceId,
-        has_key: true,
-        key_type: 'premium',
-        checked_at: new Date().toISOString(),
-      },
-    });
+  // First, check the license-key database (admin panel generated keys)
+  const dbKey = store.getKey(key);
+  if (dbKey) {
+    // Validate via the keys engine (checks expiry, blocked, disabled, device binding)
+    const validation = keysEngine.validateKey(key, deviceId);
+    if (validation.ok) {
+      const planId = dbKey.type === 'permanent' ? 'premium' : (dbKey.plan_id || 'premium');
+      const resp = buildEntitlement(deviceId, dbKey.expires_at, planId);
+      device.keyState = resp.key_state;
+      keys.set(key, resp.key_state);
+      jsonOk(res, resp);
+      return;
+    } else {
+      // Key exists in DB but is expired/blocked/disabled/device mismatch
+      jsonError(res, 403, validation.code, validation.message);
+      return;
+    }
+  }
+
+  // Fallback: prefix-based validation for keys not in the database
+  if (prefixMatches) {
+    const resp = buildEntitlement(deviceId, null, 'premium');
+    device.keyState = resp.key_state;
+    keys.set(key, resp.key_state);
+    jsonOk(res, resp);
   } else {
     jsonError(res, 400, 'key_invalid', 'Invalid license key format.');
   }

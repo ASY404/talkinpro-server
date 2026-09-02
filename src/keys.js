@@ -29,7 +29,7 @@
 const crypto = require('crypto');
 const store = require('./store');
 
-const KEY_PREFIX = process.env.KEY_PREFIX || 'fool403_';
+const KEY_PREFIX = process.env.KEY_PREFIX || 'talkpro_';
 
 // ---------- Key generation ----------
 

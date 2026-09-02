@@ -35,7 +35,7 @@ const config = {
   signingSecret: required('APP_SIGNING_SECRET', ''),
   entitlementPublicKeyHex: required('ENTITLEMENT_PUBLIC_KEY_HEX', ''),
   entitlementPrivateKeyHex: required('ENTITLEMENT_PRIVATE_KEY_HEX', ''),
-  keyPrefix: process.env.KEY_PREFIX || 'pro_',
+  keyPrefix: process.env.KEY_PREFIX || 'talkpro_',
   freeEntitlement: (process.env.FREE_ENTITLEMENT || 'true').toLowerCase() === 'true',
 
   // Agora
