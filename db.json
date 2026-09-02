@@ -68,6 +68,11 @@
     {
       "type": "admin_login",
       "detail": "Admin logged in",
+      "at": "2026-09-02T19:32:28.383Z"
+    },
+    {
+      "type": "admin_login",
+      "detail": "Admin logged in",
       "at": "2026-09-02T19:27:37.409Z"
     },
     {
