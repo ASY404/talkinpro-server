@@ -66,6 +66,11 @@
   },
   "activity": [
     {
+      "type": "admin_login",
+      "detail": "Admin logged in",
+      "at": "2026-09-02T19:27:37.409Z"
+    },
+    {
       "device_id": "bcf4a8a24fde69511f06e572d436c229",
       "key": "talkpro_bfebfc9490057c1a227f562a",
       "type": "key_activated",
