@@ -100,6 +100,41 @@ function getOrCreateDevice(deviceId) {
   return devices.get(deviceId);
 }
 
+// Helper: persist device keyState to store (survive Render restarts)
+function persistDeviceKeyState(deviceId, key, keyState) {
+  try {
+    const dev = store.getDevice(deviceId) || {
+      device_id: deviceId,
+      first_seen: new Date().toISOString(),
+    };
+    dev.last_seen = new Date().toISOString();
+    dev.key = key;
+    dev.key_state = keyState;
+    store.putDevice(deviceId, dev);
+  } catch (e) {
+    console.error('[persistDeviceKeyState] error:', e.message);
+  }
+}
+
+// Helper: load device keyState from store (after Render restart)
+function loadDeviceKeyState(deviceId) {
+  try {
+    const dev = store.getDevice(deviceId);
+    if (dev && dev.key_state && dev.key_state.state === 'active') {
+      if (dev.key) {
+        const validation = keysEngine.validateKey(dev.key, deviceId);
+        if (validation.ok) {
+          return dev.key_state;
+        }
+      }
+      return dev.key_state;
+    }
+  } catch (e) {
+    console.error('[loadDeviceKeyState] error:', e.message);
+  }
+  return null;
+}
+
 // ── Helper: all features enabled ────────────────────────────
 const ALL_FEATURES = {
   prank: true,
@@ -361,6 +396,10 @@ app.get('/v1/session/entitlement', (req, res) => {
  * POST /v1/session/key
  * Activate a license key.
  * Body: { key: "talkpro_xxxx", device_id: "..." }
+ *
+ * ★ CRITICAL: The response MUST include `signature` + `public_key_hex` so the
+ *   app can verify the entitlement came from our server (Ed25519 signature).
+ *   Without these, the app treats the entitlement as untrusted → "key invalid".
  */
 app.post('/v1/session/key', (req, res) => {
   const { key, device_id } = req.body;
@@ -373,22 +412,12 @@ app.post('/v1/session/key', (req, res) => {
   const device = getOrCreateDevice(deviceId);
 
   // Key validation: accept keys starting with our prefix OR legacy prefixes.
-  // Also check the license-key database (admin-generated keys) for full validation.
   const acceptedPrefixes = [config.keyPrefix, 'talkpro_', 'pro_', 'fool403_'].filter(Boolean);
   const prefixMatches = acceptedPrefixes.some(p => key.startsWith(p));
 
-  // Build the standard premium entitlement response
-  const buildEntitlement = (deviceId, expiresAt, planId) => ({
-    key_state: {
-      key_id: key,
-      state: 'active',
-      maxAccounts: 100,
-      features: ALL_FEATURES,
-      expiresAt: expiresAt || null,
-      planId: planId || 'premium',
-      activatedAt: new Date().toISOString(),
-    },
-    entitlement: {
+  // Build the standard premium entitlement + sign it
+  const buildSignedResponse = (deviceId, expiresAt, planId) => {
+    const entitlement = {
       features: ALL_FEATURES,
       max_accounts: 100,
       max_accounts_ceiling: 100,
@@ -399,33 +428,57 @@ app.post('/v1/session/key', (req, res) => {
       has_key: true,
       key_type: 'premium',
       checked_at: new Date().toISOString(),
-    },
-  });
+    };
+    // ★ Sign the entitlement payload (same fields as /v1/session/entitlement)
+    const signature = signPayload({
+      features: entitlement.features,
+      plan_id: entitlement.plan_id,
+      device_id: deviceId,
+      expires_at: entitlement.expires_at,
+    });
+    return {
+      key_state: {
+        key_id: key,
+        state: 'active',
+        maxAccounts: 100,
+        features: ALL_FEATURES,
+        expiresAt: expiresAt || null,
+        planId: planId || 'premium',
+        activatedAt: new Date().toISOString(),
+      },
+      entitlement,
+      signature,
+      public_key_hex: config.entitlementPublicKeyHex,
+    };
+  };
 
   // First, check the license-key database (admin panel generated keys)
   const dbKey = store.getKey(key);
   if (dbKey) {
-    // Validate via the keys engine (checks expiry, blocked, disabled, device binding)
-    const validation = keysEngine.validateKey(key, deviceId);
-    if (validation.ok) {
+    // ★ Use activateKey() to properly bind device (validateKey doesn't bind)
+    const activation = keysEngine.activateKey(key, deviceId, {});
+    if (activation.ok) {
       const planId = dbKey.type === 'permanent' ? 'premium' : (dbKey.plan_id || 'premium');
-      const resp = buildEntitlement(deviceId, dbKey.expires_at, planId);
+      const resp = buildSignedResponse(deviceId, dbKey.expires_at, planId);
       device.keyState = resp.key_state;
       keys.set(key, resp.key_state);
+      // ★ Persist device keyState to store so it survives Render restarts
+      persistDeviceKeyState(deviceId, key, resp.key_state);
       jsonOk(res, resp);
       return;
     } else {
       // Key exists in DB but is expired/blocked/disabled/device mismatch
-      jsonError(res, 403, validation.code, validation.message);
+      jsonError(res, 403, activation.code, activation.message);
       return;
     }
   }
 
   // Fallback: prefix-based validation for keys not in the database
   if (prefixMatches) {
-    const resp = buildEntitlement(deviceId, null, 'premium');
+    const resp = buildSignedResponse(deviceId, null, 'premium');
     device.keyState = resp.key_state;
     keys.set(key, resp.key_state);
+    persistDeviceKeyState(deviceId, key, resp.key_state);
     jsonOk(res, resp);
   } else {
     jsonError(res, 400, 'key_invalid', 'Invalid license key format.');
@@ -435,10 +488,46 @@ app.post('/v1/session/key', (req, res) => {
 /**
  * GET /v1/session/key?device_id=<id>
  * Check the current key state for a device.
+ * ★ Also re-validates the key from X-Key header (survives Render restarts).
  */
 app.get('/v1/session/key', (req, res) => {
   const deviceId = req.query.device_id || req.query.deviceId || generateDeviceId(req);
   const device = getOrCreateDevice(deviceId);
+
+  // ★ Check X-Key header — if present, re-validate the key from the database
+  const headerKey = req.headers['x-key'] || req.headers['x-license-key'] || req.query.key;
+  if (headerKey) {
+    const dbKey = store.getKey(headerKey);
+    if (dbKey) {
+      const validation = keysEngine.validateKey(headerKey, deviceId);
+      if (validation.ok) {
+        const planId = dbKey.type === 'permanent' ? 'premium' : (dbKey.plan_id || 'premium');
+        const keyState = {
+          key_id: headerKey,
+          state: 'active',
+          maxAccounts: 100,
+          features: ALL_FEATURES,
+          expiresAt: dbKey.expires_at,
+          planId: planId,
+          activatedAt: dbKey.activated_at || new Date().toISOString(),
+        };
+        device.keyState = keyState;
+        jsonOk(res, { key_state: keyState });
+        return;
+      } else {
+        jsonOk(res, { key_state: { key_id: headerKey, state: validation.code, expiresAt: dbKey.expires_at } });
+        return;
+      }
+    }
+  }
+
+  // ★ Restore from persisted store if in-memory was wiped (Render restart)
+  if (!device.keyState) {
+    const persisted = loadDeviceKeyState(deviceId);
+    if (persisted) {
+      device.keyState = persisted;
+    }
+  }
 
   if (device.keyState) {
     jsonOk(res, { key_state: device.keyState });
@@ -827,6 +916,160 @@ app.post('/v1/activity/log', (req, res) => {
     detail: text ? text.slice(0, 200) : (media_url ? 'media: ' + media_url : (room ? 'room: ' + room : '')),
   });
   jsonOk(res, { logged: true });
+});
+
+// ========================================================================
+// ROOM API STUBS — /api/room/v1/*
+// The app calls these endpoints on the ROOM server domain (talkinpro.onrender.com).
+// These stubs return reasonable default responses so the app doesn't crash
+// when the room features are used. Real room state would require a database.
+// ========================================================================
+
+app.get('/api/room/v1/cfg', (req, res) => {
+  jsonOk(res, {
+    cfg: {
+      mic_limit: 8,
+      audience_limit: 1000,
+      gift_enabled: true,
+      music_bot_enabled: true,
+      screen_share_enabled: true,
+      voice_effect_enabled: true,
+      soundbox_enabled: true,
+      prank_enabled: true,
+      max_prank_messages: 100,
+      max_sticker_messages: 100,
+      max_media_prank_messages: 100,
+      max_volume: 200,
+    },
+  });
+});
+
+app.get('/api/room/v1/audio/list', (req, res) => {
+  jsonOk(res, { rooms: [], total: 0, has_more: false });
+});
+
+app.get('/api/room/v1/audio/recommend', (req, res) => {
+  jsonOk(res, { rooms: [], total: 0 });
+});
+
+app.get('/api/room/v1/audio/rank', (req, res) => {
+  jsonOk(res, { rank: [], total: 0 });
+});
+
+app.get('/api/room/v1/room/info', (req, res) => {
+  const roomId = req.query.room_id;
+  jsonOk(res, {
+    room: {
+      room_id: roomId,
+      name: 'Talkin Pro Room',
+      host_aid: 0,
+      host_name: '',
+      type: 'social',
+      status: 'active',
+      online: 1,
+      mic_count: 0,
+      audience_count: 0,
+      created_at: new Date().toISOString(),
+    },
+  });
+});
+
+app.get('/api/room/v1/room/summary', (req, res) => {
+  jsonOk(res, { summary: { rooms: 0, online: 0 } });
+});
+
+app.get('/api/room/v1/room/enter_check', (req, res) => {
+  jsonOk(res, { allowed: true, reason: '' });
+});
+
+app.get('/api/room/v1/room/live', (req, res) => {
+  jsonOk(res, { rooms: [] });
+});
+
+app.get('/api/room/v1/audio', (req, res) => {
+  const roomId = req.query.room_id;
+  jsonOk(res, {
+    room: {
+      room_id: roomId,
+      name: 'Talkin Pro Room',
+      status: 'active',
+      online: 1,
+    },
+    mic_seats: [],
+    audiences: [],
+  });
+});
+
+app.get('/api/room/v1/audio/audiences', (req, res) => {
+  jsonOk(res, { audiences: [], total: 0 });
+});
+
+app.post('/api/room/v1/audio/exit', (req, res) => {
+  jsonOk(res, { exited: true });
+});
+
+app.post('/api/room/v1/audio/kickout', (req, res) => {
+  jsonOk(res, { kicked: true });
+});
+
+app.post('/api/room/v1/admin/close', (req, res) => {
+  jsonOk(res, { closed: true });
+});
+
+// Mic management
+app.get('/api/room/v1/mic', (req, res) => {
+  jsonOk(res, { mic_seats: [], total: 0 });
+});
+
+app.get('/api/room/v1/mic/applicants', (req, res) => {
+  jsonOk(res, { applicants: [], total: 0 });
+});
+
+app.post('/api/room/v1/mic/apply', (req, res) => {
+  jsonOk(res, { applied: true, position: 0 });
+});
+
+app.post('/api/room/v1/mic/mute', (req, res) => {
+  jsonOk(res, { muted: true });
+});
+
+app.get('/api/room/v1/mic/state', (req, res) => {
+  jsonOk(res, { state: 'idle', mic_seats: [] });
+});
+
+app.post('/api/room/v1/mic/invite/reply', (req, res) => {
+  jsonOk(res, { replied: true });
+});
+
+app.post('/api/room/v1/mic/audit_opinion', (req, res) => {
+  jsonOk(res, { audited: true });
+});
+
+// Gifts
+app.get('/api/room/v1/gift/panel', (req, res) => {
+  jsonOk(res, {
+    gifts: [],
+    panels: [],
+  });
+});
+
+// Event heartbeat
+app.post('/api/room/v1/event/heartbeat', (req, res) => {
+  jsonOk(res, { ok: true, active: true });
+});
+
+// Catch-all for any other /api/room/v1/* endpoints
+app.use('/api/room/v1', (req, res) => {
+  jsonOk(res, { ok: true, stub: true, path: req.path });
+});
+
+// Also handle /api/toolkit/v1/* and /api/user/v1/* stubs
+app.use('/api/toolkit/v1', (req, res) => {
+  jsonOk(res, { ok: true, stub: true });
+});
+
+app.use('/api/user/v1', (req, res) => {
+  jsonOk(res, { ok: true, stub: true });
 });
 
 // ════════════════════════════════════════════════════════════════
