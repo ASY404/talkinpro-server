@@ -50,6 +50,11 @@
   },
   "activity": [
     {
+      "type": "admin_login",
+      "detail": "Admin logged in",
+      "at": "2026-09-02T19:05:58.319Z"
+    },
+    {
       "key": "talkpro_da8e178f4293c1f1f019844e",
       "type": "key_deleted",
       "detail": "Admin deleted key",
