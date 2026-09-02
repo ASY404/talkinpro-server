@@ -22,11 +22,11 @@
       "duration_days": null,
       "status": "active",
       "note": "user-real-key",
-      "device_id": "test-fresh-phone-001",
-      "device_info": {},
+      "device_id": null,
+      "device_info": null,
       "mismatch_attempts": 0,
       "created_at": "2026-09-02T19:07:15.042Z",
-      "activated_at": "2026-09-02T19:45:12.305Z",
+      "activated_at": null,
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -139,6 +139,12 @@
     }
   },
   "activity": [
+    {
+      "key": "talkpro_d35f5501bc77a5cf16261e45",
+      "type": "key_unbound",
+      "detail": "Admin unbound device — key ready for new device",
+      "at": "2026-09-02T19:45:33.151Z"
+    },
     {
       "device_id": "test-fresh-phone-001",
       "key": "talkpro_d35f5501bc77a5cf16261e45",
