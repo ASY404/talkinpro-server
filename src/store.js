@@ -29,18 +29,28 @@ async function initFromGitHub() {
   }
   console.log('[store] Initializing persistent storage from GitHub backup...');
   try {
+    // Make sure local DB is loaded first so _db is not null
+    if (!_db) {
+      load();
+    }
     await ghStore.ensureBranch();
     const ghDb = await ghStore.pullFromGitHub();
     if (ghDb && ghDb.keys) {
       // Merge: GitHub version has the persisted keys. Use it as our base.
-      const localDb = _db;
+      const localDb = _db || { keys: {}, devices: {}, activity: [], loginTokens: {}, messages: [] };
       // If we have a local db.json that has MORE keys than GitHub (race during deploy),
       // merge them. Otherwise, GitHub version wins.
       const localKeys = Object.keys(localDb.keys || {});
       const ghKeys = Object.keys(ghDb.keys || {});
       console.log(`[store] Local keys: ${localKeys.length}, GitHub keys: ${ghKeys.length}`);
       // Use GitHub as base, then add any local keys not in GitHub
-      const merged = ghDb;
+      const merged = JSON.parse(JSON.stringify(ghDb)); // deep clone to avoid mutation
+      if (!merged.keys) merged.keys = {};
+      if (!merged.devices) merged.devices = {};
+      if (!merged.activity) merged.activity = [];
+      if (!merged.loginTokens) merged.loginTokens = {};
+      if (!merged.messages) merged.messages = [];
+      if (!merged.meta) merged.meta = localDb.meta || { created_at: new Date().toISOString(), version: 2 };
       for (const k of localKeys) {
         if (!merged.keys[k]) {
           merged.keys[k] = localDb.keys[k];
@@ -53,14 +63,13 @@ async function initFromGitHub() {
         }
       }
       if (localDb.loginTokens) {
-        merged.loginTokens = merged.loginTokens || {};
         for (const t of Object.keys(localDb.loginTokens || {})) {
           if (!merged.loginTokens[t]) merged.loginTokens[t] = localDb.loginTokens[t];
         }
       }
       _db = merged;
       saveSync(); // persist merged version locally too
-      console.log('[store] Loaded persistent DB from GitHub backup.');
+      console.log(`[store] Loaded persistent DB from GitHub backup (${ghKeys.length} keys).`);
     } else {
       console.log('[store] No GitHub backup found — using local db.json.');
     }
@@ -85,6 +94,11 @@ async function init() {
   }
   console.log('[store] Initializing persistent storage from GitHub backup...');
   try {
+    // Make sure local DB is loaded first
+    if (!_db) {
+      load();
+    }
+
     // Race between GitHub pull and a 15s timeout
     const timeoutPromise = new Promise(resolve => setTimeout(() => {
       console.warn('[store] GitHub pull timed out after 15s — starting with local data.');
@@ -162,14 +176,18 @@ function load() {
       if (!_db.meta) _db.meta = DEFAULT_DB.meta;
     } else {
       _db = JSON.parse(JSON.stringify(DEFAULT_DB));
-      saveSync();
+      // Only save locally (not to GitHub yet — GitHub pull hasn't happened)
+      ensureDir();
+      try { fs.writeFileSync(DB_FILE, JSON.stringify(_db, null, 2), 'utf8'); } catch(e) {}
     }
   } catch (e) {
     console.error('[store] load error, starting fresh:', e.message);
     _db = JSON.parse(JSON.stringify(DEFAULT_DB));
   }
-  // Kick off GitHub pull (async — merges into _db when done)
-  if (!_githubPullPromise && ghStore.isConfigured()) {
+  // Note: GitHub pull is triggered by init(), not here, to avoid double-init.
+  // If init() was never called (e.g., this is a module loaded outside server.js),
+  // we still trigger it here as a fallback.
+  if (!_githubPullPromise && !_githubReady && ghStore.isConfigured()) {
     _githubPullPromise = initFromGitHub();
   }
   return _db;
@@ -186,7 +204,8 @@ function saveSync() {
   } catch (e) {
     console.error('[store] saveSync error:', e.message);
   }
-  // Schedule GitHub backup
+  // Schedule GitHub backup — but only if we've finished the initial pull
+  // (to avoid overwriting the backup with an empty DB before we've loaded from GitHub)
   if (_githubReady) {
     ghStore.schedulePush(_db);
   } else if (ghStore.isConfigured() && _githubPullPromise) {
