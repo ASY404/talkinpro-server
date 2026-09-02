@@ -111,6 +111,11 @@
   },
   "activity": [
     {
+      "type": "admin_login",
+      "detail": "Admin logged in",
+      "at": "2026-09-02T19:41:56.103Z"
+    },
+    {
       "device_id": "sig-test-device",
       "key": "talkpro_fa4643e09af77b12217033e0",
       "type": "key_activated",
