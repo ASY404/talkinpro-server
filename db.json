@@ -39,7 +39,7 @@
       "first_seen": "2026-09-02T18:58:57.795Z",
       "key": "talkpro_f14edce852583284d273bf15",
       "info": {},
-      "last_seen": "2026-09-02T18:58:57.827Z",
+      "last_seen": "2026-09-02T18:59:10.233Z",
       "key_state": {
         "key_id": "talkpro_f14edce852583284d273bf15",
         "state": "active",
@@ -60,7 +60,7 @@
         },
         "expiresAt": null,
         "planId": "premium",
-        "activatedAt": "2026-09-02T18:58:57.827Z"
+        "activatedAt": "2026-09-02T18:59:10.233Z"
       }
     }
   },
