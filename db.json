@@ -15,22 +15,6 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
-    },
-    "talkpro_33383519e945aa0f3c2fea1f": {
-      "key": "talkpro_33383519e945aa0f3c2fea1f",
-      "type": "permanent",
-      "duration_days": null,
-      "status": "active",
-      "note": "delete-sync-test",
-      "device_id": null,
-      "device_info": null,
-      "mismatch_attempts": 0,
-      "created_at": "2026-09-02T19:06:07.360Z",
-      "activated_at": null,
-      "expires_at": null,
-      "reset_count": 0,
-      "reset_from": null,
-      "admin": "ASY404"
     }
   },
   "devices": {
@@ -65,6 +49,12 @@
     }
   },
   "activity": [
+    {
+      "key": "talkpro_33383519e945aa0f3c2fea1f",
+      "type": "key_deleted",
+      "detail": "Admin deleted key",
+      "at": "2026-09-02T19:06:22.912Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 1 key(s) of type permanent",
