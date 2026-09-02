@@ -1,7 +1,30 @@
 {
-  "keys": {},
+  "keys": {
+    "talkpro_bfebfc9490057c1a227f562a": {
+      "key": "talkpro_bfebfc9490057c1a227f562a",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "persistence-final-test",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-02T14:51:12.860Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    }
+  },
   "devices": {},
-  "activity": [],
+  "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 1 key(s) of type permanent",
+      "at": "2026-09-02T14:51:12.860Z"
+    }
+  ],
   "loginTokens": {},
   "messages": [],
   "meta": {
