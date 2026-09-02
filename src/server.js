@@ -1143,12 +1143,13 @@ app.post('/admin/api/keys/:key/:action', (req, res) => {
   if (action === 'enable') result = keysEngine.enableKey(key);
   else if (action === 'disable') result = keysEngine.disableKey(key);
   else if (action === 'unblock') result = keysEngine.unblockKey(key);
+  else if (action === 'unbind') result = keysEngine.unbindKey(key);
   else if (action === 'reset') result = keysEngine.resetKey(key);
   else if (action === 'delete') {
     const ok = keysEngine.removeKey(key);
     return jsonOk(res, { deleted: ok });
   } else {
-    return jsonError(res, 400, 'invalid_action', 'Use: enable, disable, unblock, reset, delete');
+    return jsonError(res, 400, 'invalid_action', 'Use: enable, disable, unblock, unbind, reset, delete');
   }
   if (!result) return jsonError(res, 404, 'not_found', 'Key not found');
   if (result.error) return jsonError(res, 400, 'error', result.error);

@@ -296,6 +296,27 @@ function unblockKey(keyStr) {
 }
 
 /**
+ * Unbind → clear device binding entirely so a NEW device can activate the key.
+ * Unlike unblockKey() (which only resets mismatch_attempts but keeps device_id),
+ * unbindKey() clears device_id, device_info, mismatch_attempts AND sets status=active.
+ * This lets the user bind the key to their real phone from scratch.
+ *
+ * Use case: key was tested on a dev device, now needs to work on user's real phone.
+ */
+function unbindKey(keyStr) {
+  const r = store.getKey(keyStr);
+  if (!r) return null;
+  r.status = 'active';
+  r.device_id = null;
+  r.device_info = null;
+  r.mismatch_attempts = 0;
+  r.activated_at = null;
+  store.putKey(keyStr, r);
+  store.logActivity({ key: keyStr, type: 'key_unbound', detail: 'Admin unbound device — key ready for new device' });
+  return r;
+}
+
+/**
  * Reset → generate a brand new key string; old key invalidated.
  * Old key stays in store (for history) but is marked 'reset'.
  * Device binding cleared → user must re-activate with new key on their phone.
@@ -365,6 +386,7 @@ module.exports = {
   enableKey,
   disableKey,
   unblockKey,
+  unbindKey,
   resetKey,
   removeKey,
   isExpired,

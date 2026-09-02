@@ -337,6 +337,7 @@ function renderKeys(){
         ${k.status==='active'?'<button class="btn btn-grey btn-sm" onclick="keyAct(\''+k.key+'\',\'disable\')">Disable</button>':''}
         ${k.status==='disabled'?'<button class="btn btn-blue btn-sm" onclick="keyAct(\''+k.key+'\',\'enable\')">Enable</button>':''}
         ${k.status==='blocked'?'<button class="btn btn-blue btn-sm" onclick="keyAct(\''+k.key+'\',\'unblock\')">Unblock</button>':''}
+        ${k.device_id?'<button class="btn btn-blue btn-sm" onclick="keyAct(\''+k.key+'\',\'unbind\')">Unbind Device</button>':''}
         <button class="btn btn-grey btn-sm" onclick="keyAct(\''+k.key+'\',\'reset\')">Reset</button>
         <button class="btn btn-red btn-sm" onclick="keyAct(\''+k.key+'\',\'delete\')">Delete</button>
       </div></td>
@@ -346,11 +347,14 @@ function renderKeys(){
 async function keyAct(key, action){
   if(action==='delete' && !confirm('Delete this key permanently? This CANNOT be undone.')) return;
   if(action==='reset' && !confirm('Reset this key? Old key will stop working. A new key will be generated.')) return;
+  if(action==='unbind' && !confirm('Unbind device from this key? The key will be free to activate on a new phone.')) return;
   try {
     const d = await api('/admin/api/keys/'+key+'/'+action, {method:'POST'});
     if(d.status==='ok'){
       if(action==='reset' && d.new_key){
         alert('Key reset! NEW key: '+d.new_key+'\\nGive this new key to the user.');
+      } else if(action==='unbind'){
+        showToast('Device unbound! Key is now free to activate on a new phone.', 'ok');
       } else {
         showToast(action.charAt(0).toUpperCase()+action.slice(1)+' successful', 'ok');
       }
