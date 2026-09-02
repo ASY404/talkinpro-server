@@ -1,0 +1,24 @@
+{
+  "name": "talkinpro-server",
+  "version": "1.0.0",
+  "description": "Talkin Pro — backend server for the modded Talking app (license, entitlement, crypto, updates)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "keygen": "node src/keygen.js",
+    "token:agora": "node src/agora-token.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "firebase-admin": "^12.1.0",
+    "agora-access-token": "^2.0.4"
+  }
+}
