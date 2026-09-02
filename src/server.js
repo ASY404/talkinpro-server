@@ -1218,6 +1218,20 @@ app.get('/admin/api/stats', (_req, res) => {
   jsonOk(res, stats);
 });
 
+// Debug: GitHub sync status (admin only)
+app.get('/admin/api/sync-status', async (_req, res) => {
+  const ghStore = require('./github-store');
+  const status = ghStore.getStatus();
+  status.server_keys = store.listKeys().length;
+  jsonOk(res, status);
+});
+
+// Debug: Force sync to GitHub now (admin only)
+app.post('/admin/api/sync-now', async (_req, res) => {
+  const result = await store.forceSyncToGitHub();
+  jsonOk(res, result);
+});
+
 app.post('/admin/announce', async (req, res) => {
   const adminSecret = process.env.ADMIN_SECRET;
   if (adminSecret && req.headers['x-admin-secret'] !== adminSecret) {

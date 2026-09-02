@@ -251,7 +251,22 @@ function deleteKey(keyStr) {
   const existed = !!db.keys[keyStr];
   delete db.keys[keyStr];
   saveSync();
+  // Force an immediate GitHub push for deletions so a deleted key
+  // doesn't reappear after a restart (debounced push can be dropped).
+  if (ghStore.isConfigured()) {
+    ghStore.forcePush(_db).catch(e => console.error('[store] forcePush error:', e.message));
+  }
   return existed;
+}
+
+/**
+ * Force an immediate GitHub sync (bypasses debounce).
+ */
+async function forceSyncToGitHub() {
+  if (ghStore.isConfigured()) {
+    return await ghStore.forcePush(_db);
+  }
+  return { ok: false, reason: 'not configured' };
 }
 
 // ---------- Device operations ----------
@@ -366,5 +381,6 @@ module.exports = {
   listMessages,
   exportAll,
   importAll,
+  forceSyncToGitHub,
   DB_FILE,
 };

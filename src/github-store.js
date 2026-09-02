@@ -187,10 +187,42 @@ function schedulePush(dbObject) {
   }, 3000); // 3 second debounce
 }
 
+/**
+ * Get sync status for debugging.
+ */
+function getStatus() {
+  return {
+    configured: isConfigured(),
+    repo: GITHUB_REPO,
+    branch: GITHUB_BRANCH,
+    lastSha: _lastSha,
+    syncing: _syncing,
+    hasPendingPush: !!_pushTimer,
+  };
+}
+
+/**
+ * Force an immediate push (bypassing the debounce).
+ * Used for critical operations like key deletion to ensure the change
+ * is persisted to GitHub before any restart can happen.
+ */
+async function forcePush(dbObject) {
+  if (!isConfigured()) return { ok: false, reason: 'not configured' };
+  // Cancel any pending debounced push
+  if (_pushTimer) {
+    clearTimeout(_pushTimer);
+    _pushTimer = null;
+  }
+  await pushToGitHub(dbObject);
+  return { ok: true, syncing: _syncing };
+}
+
 module.exports = {
   isConfigured,
   ensureBranch,
   pullFromGitHub,
   pushToGitHub,
   schedulePush,
+  forcePush,
+  getStatus,
 };
