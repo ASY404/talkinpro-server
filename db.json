@@ -22,11 +22,11 @@
       "duration_days": null,
       "status": "active",
       "note": "user-real-key",
-      "device_id": null,
-      "device_info": null,
+      "device_id": "test-fresh-phone-001",
+      "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-02T19:07:15.042Z",
-      "activated_at": null,
+      "activated_at": "2026-09-02T19:45:12.305Z",
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -107,9 +107,45 @@
         "planId": "premium",
         "activatedAt": "2026-09-02T19:32:44.053Z"
       }
+    },
+    "test-fresh-phone-001": {
+      "device_id": "test-fresh-phone-001",
+      "first_seen": "2026-09-02T19:45:12.306Z",
+      "key": "talkpro_d35f5501bc77a5cf16261e45",
+      "info": {},
+      "last_seen": "2026-09-02T19:45:12.471Z",
+      "key_state": {
+        "key_id": "talkpro_d35f5501bc77a5cf16261e45",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-02T19:45:12.471Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "test-fresh-phone-001",
+      "key": "talkpro_d35f5501bc77a5cf16261e45",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-02T19:45:12.307Z"
+    },
     {
       "key": "talkpro_fa4643e09af77b12217033e0",
       "type": "key_unbound",
