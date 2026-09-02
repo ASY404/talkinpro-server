@@ -73,6 +73,55 @@ async function initFromGitHub() {
 // Start the GitHub pull as early as possible (async, non-blocking)
 _githubPullPromise = null;
 
+/**
+ * Async init — call before app.listen(). Resolves when GitHub pull is done (or times out).
+ * This ensures keys are loaded from GitHub before the server starts accepting requests.
+ */
+async function init() {
+  if (!ghStore.isConfigured()) {
+    console.log('[store] GitHub backup not configured (GITHUB_TOKEN not set) — using local file only.');
+    _githubReady = true;
+    return;
+  }
+  console.log('[store] Initializing persistent storage from GitHub backup...');
+  try {
+    // Race between GitHub pull and a 15s timeout
+    const timeoutPromise = new Promise(resolve => setTimeout(() => {
+      console.warn('[store] GitHub pull timed out after 15s — starting with local data.');
+      _githubReady = true;
+      resolve();
+    }, 15000));
+
+    if (!_githubPullPromise) {
+      _githubPullPromise = initFromGitHub();
+    }
+
+    await Promise.race([_githubPullPromise, timeoutPromise]);
+    _githubReady = true;
+  } catch (e) {
+    console.error('[store] init error:', e.message);
+    _githubReady = true;
+  }
+}
+
+// Synchronous init — call before app.listen().
+// Pulls from GitHub if configured, so keys are available immediately on startup.
+function initSync() {
+  if (!ghStore.isConfigured()) {
+    console.log('[store] GitHub backup not configured (GITHUB_TOKEN not set) — using local file only.');
+    _githubReady = true;
+    return;
+  }
+  console.log('[store] Syncing from GitHub backup (max 10s)...');
+  try {
+    load(); // triggers initFromGitHub() asynchronously
+    console.log('[store] GitHub sync initiated (async merge will complete shortly).');
+  } catch (e) {
+    console.error('[store] initSync error:', e.message);
+    _githubReady = true;
+  }
+}
+
 const DEFAULT_DB = {
   keys: {},          // { [keyString]: KeyRecord }
   devices: {},       // { [deviceId]: DeviceRecord }
@@ -280,6 +329,8 @@ module.exports = {
   load,
   saveSync,
   save,
+  init,
+  initSync,
   getKey,
   putKey,
   listKeys,

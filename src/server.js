@@ -1298,6 +1298,13 @@ function generateDeviceId(req) {
 // ════════════════════════════════════════════════════════════
 
 async function start() {
+  // Initialize persistent storage from GitHub backup (if configured)
+  try {
+    await store.init();
+  } catch (e) {
+    console.warn('⚠️  Store init error:', e.message);
+  }
+
   // Initialize Firebase Admin (if configured)
   try {
     initFirebase();
