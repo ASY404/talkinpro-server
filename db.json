@@ -66,6 +66,11 @@
   },
   "activity": [
     {
+      "type": "admin_login",
+      "detail": "Admin logged in",
+      "at": "2026-09-02T19:09:58.572Z"
+    },
+    {
       "type": "key_created",
       "detail": "Created 1 key(s) of type permanent",
       "at": "2026-09-02T19:07:15.043Z"
