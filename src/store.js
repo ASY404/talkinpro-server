@@ -13,9 +13,65 @@
 
 const fs = require('fs');
 const path = require('path');
+const ghStore = require('./github-store');
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
+
+// Startup: pull from GitHub backup (if configured) so keys survive Render restarts
+let _githubPullPromise = null;
+let _githubReady = false;
+
+async function initFromGitHub() {
+  if (!ghStore.isConfigured()) {
+    _githubReady = true;
+    return;
+  }
+  console.log('[store] Initializing persistent storage from GitHub backup...');
+  try {
+    await ghStore.ensureBranch();
+    const ghDb = await ghStore.pullFromGitHub();
+    if (ghDb && ghDb.keys) {
+      // Merge: GitHub version has the persisted keys. Use it as our base.
+      const localDb = _db;
+      // If we have a local db.json that has MORE keys than GitHub (race during deploy),
+      // merge them. Otherwise, GitHub version wins.
+      const localKeys = Object.keys(localDb.keys || {});
+      const ghKeys = Object.keys(ghDb.keys || {});
+      console.log(`[store] Local keys: ${localKeys.length}, GitHub keys: ${ghKeys.length}`);
+      // Use GitHub as base, then add any local keys not in GitHub
+      const merged = ghDb;
+      for (const k of localKeys) {
+        if (!merged.keys[k]) {
+          merged.keys[k] = localDb.keys[k];
+        }
+      }
+      // Merge devices, activity, messages similarly (keep latest)
+      if (localDb.devices) {
+        for (const d of Object.keys(localDb.devices)) {
+          if (!merged.devices[d]) merged.devices[d] = localDb.devices[d];
+        }
+      }
+      if (localDb.loginTokens) {
+        merged.loginTokens = merged.loginTokens || {};
+        for (const t of Object.keys(localDb.loginTokens || {})) {
+          if (!merged.loginTokens[t]) merged.loginTokens[t] = localDb.loginTokens[t];
+        }
+      }
+      _db = merged;
+      saveSync(); // persist merged version locally too
+      console.log('[store] Loaded persistent DB from GitHub backup.');
+    } else {
+      console.log('[store] No GitHub backup found — using local db.json.');
+    }
+  } catch (e) {
+    console.error('[store] initFromGitHub error:', e.message);
+  }
+  _githubReady = true;
+}
+
+// Start the GitHub pull as early as possible (async, non-blocking)
+_githubPullPromise = null;
 
 const DEFAULT_DB = {
   keys: {},          // { [keyString]: KeyRecord }
@@ -63,11 +119,16 @@ function load() {
     console.error('[store] load error, starting fresh:', e.message);
     _db = JSON.parse(JSON.stringify(DEFAULT_DB));
   }
+  // Kick off GitHub pull (async — merges into _db when done)
+  if (!_githubPullPromise && ghStore.isConfigured()) {
+    _githubPullPromise = initFromGitHub();
+  }
   return _db;
 }
 
 /**
  * Save synchronously (used on critical writes like key creation/block).
+ * Also schedules a GitHub backup push.
  */
 function saveSync() {
   ensureDir();
@@ -76,14 +137,26 @@ function saveSync() {
   } catch (e) {
     console.error('[store] saveSync error:', e.message);
   }
+  // Schedule GitHub backup
+  if (_githubReady) {
+    ghStore.schedulePush(_db);
+  } else if (ghStore.isConfigured() && _githubPullPromise) {
+    // If GitHub isn't ready yet, push after the pull completes
+    _githubPullPromise.then(() => {
+      ghStore.schedulePush(_db);
+    });
+  }
 }
 
 /**
  * Debounced save — coalesce rapid writes (activity logging).
+ * Also schedules a GitHub backup push.
  */
 function save() {
   if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(() => saveSync(), 800);
+  _saveTimer = setTimeout(() => {
+    saveSync();
+  }, 800);
 }
 
 // ---------- Key operations ----------

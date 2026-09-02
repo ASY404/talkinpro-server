@@ -276,16 +276,20 @@ async function api(path, opts={}){
 
 async function refreshAll(){
   try {
-    const [k,d,a,m,t] = await Promise.all([
+    const [k,d,a,m,t] = await Promise.allSettled([
       api('/admin/api/keys'),
       api('/admin/api/devices'),
       api('/admin/api/activity?limit=500'),
       api('/admin/api/messages?limit=500'),
       api('/admin/api/tokens'),
     ]);
-    allKeys = k.keys||[]; allDevices = d.devices||[]; allActivity = a.activity||[]; allMessages = m.messages||[]; allTokens = t.tokens||[];
+    allKeys = (k.status==='fulfilled'&&k.value)?(k.value.keys||[]):allKeys;
+    allDevices = (d.status==='fulfilled'&&d.value)?(d.value.devices||[]):allDevices;
+    allActivity = (a.status==='fulfilled'&&a.value)?(a.value.activity||[]):allActivity;
+    allMessages = (m.status==='fulfilled'&&m.value)?(m.value.messages||[]):allMessages;
+    allTokens = (t.status==='fulfilled'&&t.value)?(t.value.tokens||[]):allTokens;
     renderStats(); renderKeys(); renderDevices(); renderActivity(); renderMessages(); renderTokens(); renderRawDb();
-  } catch(e){ console.error(e); }
+  } catch(e){ console.error('refreshAll error:', e); }
 }
 
 function renderStats(){
@@ -340,13 +344,39 @@ function renderKeys(){
 }
 
 async function keyAct(key, action){
-  if(action==='delete' && !confirm('Delete this key permanently?')) return;
-  if(action==='reset' && !confirm('Reset this key? Old key will stop working on the device. A new key will be generated.')) return;
-  const d = await api('/admin/api/keys/'+key+'/'+action, {method:'POST'});
-  if(d.status==='ok'){
-    alert(action==='reset' ? 'Key reset! NEW key: '+d.new_key+'\nGive this new key to the user.' : 'Done: '+action);
-    refreshAll();
-  } else { alert('Error: '+(d.message||'failed')); }
+  if(action==='delete' && !confirm('Delete this key permanently? This CANNOT be undone.')) return;
+  if(action==='reset' && !confirm('Reset this key? Old key will stop working. A new key will be generated.')) return;
+  try {
+    const d = await api('/admin/api/keys/'+key+'/'+action, {method:'POST'});
+    if(d.status==='ok'){
+      if(action==='reset' && d.new_key){
+        alert('Key reset! NEW key: '+d.new_key+'\\nGive this new key to the user.');
+      } else {
+        showToast(action.charAt(0).toUpperCase()+action.slice(1)+' successful', 'ok');
+      }
+      refreshAll();
+    } else {
+      showToast('Error: '+(d.message||'failed'), 'err');
+    }
+  } catch(e) {
+    showToast('Network error: '+e.message, 'err');
+  }
+}
+
+function showToast(msg, type){
+  let t = document.getElementById('toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:20px;right:20px;padding:14px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:opacity 0.4s;max-width:400px;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = type==='ok' ? '#238636' : '#da3633';
+  t.style.color = '#fff';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity='0'; }, 3000);
 }
 
 async function createKeys(e){
@@ -404,7 +434,7 @@ function renderTokens(){
 
 function renderRawDb(){
   const db = {keys:Object.fromEntries(Object.entries(allKeys).slice(0,0)), _count:allKeys.length};
-  fetch('/admin/api/backup').then(r=>r.json()).then(d=>{
+  fetch('/admin/api/backup', {headers:{'X-Admin-Auth':'Bearer '+token}}).then(r=>r.json()).then(d=>{
     document.getElementById('rawDb').textContent = JSON.stringify({meta:d.meta, key_count:Object.keys(d.keys||{}).length, device_count:Object.keys(d.devices||{}).length, activity:d.activity?.length, messages:d.messages?.length}, null, 2);
   }).catch(()=>{});
 }
