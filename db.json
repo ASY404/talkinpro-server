@@ -15,10 +15,31 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "talkpro_2a2f5676e37371ce5b7fdcd6": {
+      "key": "talkpro_2a2f5676e37371ce5b7fdcd6",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "second-key",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-02T14:46:10.624Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {},
   "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 1 key(s) of type permanent",
+      "at": "2026-09-02T14:46:10.628Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 1 key(s) of type permanent",
