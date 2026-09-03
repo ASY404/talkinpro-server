@@ -127,6 +127,86 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "TALKPRO_A5BB294AAAFBD29F125BEE9F": {
+      "key": "TALKPRO_A5BB294AAAFBD29F125BEE9F",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for patched APK",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:14:28.759Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_EFE31B069CD60C2E198C5F5E": {
+      "key": "TALKPRO_EFE31B069CD60C2E198C5F5E",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for patched APK",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:14:28.759Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_C3BC808235D5925950E69023": {
+      "key": "TALKPRO_C3BC808235D5925950E69023",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for patched APK",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:14:28.759Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_7F5229DF71E2A860DA13903C": {
+      "key": "TALKPRO_7F5229DF71E2A860DA13903C",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for patched APK",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:14:28.759Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_6934422FA8E8C06784FD1B44": {
+      "key": "TALKPRO_6934422FA8E8C06784FD1B44",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for patched APK",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:14:28.759Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {
@@ -364,6 +444,11 @@
     }
   },
   "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 5 key(s) of type permanent",
+      "at": "2026-09-03T04:14:28.762Z"
+    },
     {
       "device_id": "proxy-test-001",
       "key": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
