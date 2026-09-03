@@ -246,7 +246,7 @@
       "duration_days": null,
       "status": "active",
       "note": "Fresh key for APK test",
-      "device_id": "test-fresh-001",
+      "device_id": "direct-test-999",
       "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:57:07.883Z",
@@ -1062,9 +1062,81 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T05:33:50.987Z"
       }
+    },
+    "proxy-test-999": {
+      "device_id": "proxy-test-999",
+      "first_seen": "2026-09-03T05:34:55.740Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:34:55.744Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:34:55.744Z"
+      }
+    },
+    "direct-test-999": {
+      "device_id": "direct-test-999",
+      "first_seen": "2026-09-03T05:34:55.866Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:34:55.871Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:34:55.871Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "direct-test-999",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:34:55.867Z"
+    },
+    {
+      "device_id": "proxy-test-999",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:34:55.740Z"
+    },
     {
       "device_id": "test-fresh-001",
       "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
