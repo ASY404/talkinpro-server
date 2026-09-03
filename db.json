@@ -111,6 +111,22 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "TALKPRO_76980F4CC99AECC6ABA2B3AC": {
+      "key": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "PROXY test",
+      "device_id": "proxy-test-001",
+      "device_info": {},
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:06:38.232Z",
+      "activated_at": "2026-09-03T04:06:38.417Z",
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {
@@ -316,9 +332,50 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T04:05:52.696Z"
       }
+    },
+    "proxy-test-001": {
+      "device_id": "proxy-test-001",
+      "first_seen": "2026-09-03T04:06:38.417Z",
+      "key": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
+      "info": {},
+      "last_seen": "2026-09-03T04:06:38.423Z",
+      "key_state": {
+        "key_id": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T04:06:38.423Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "proxy-test-001",
+      "key": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T04:06:38.418Z"
+    },
+    {
+      "type": "key_created",
+      "detail": "Created 1 key(s) of type permanent",
+      "at": "2026-09-03T04:06:38.233Z"
+    },
     {
       "device_id": "test-device-001",
       "key": "TALKPRO_989A726D2FC7A222340BB2FF",
