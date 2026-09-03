@@ -271,6 +271,22 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "TALKPRO_6A41253649C1644BB60D4506": {
+      "key": "TALKPRO_6A41253649C1644BB60D4506",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Fresh test key for APK verification",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T05:21:48.964Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {
@@ -856,6 +872,11 @@
     }
   },
   "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 1 key(s) of type permanent",
+      "at": "2026-09-03T05:21:48.965Z"
+    },
     {
       "device_id": "phone-user-test-002",
       "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
