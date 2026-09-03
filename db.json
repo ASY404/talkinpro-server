@@ -246,7 +246,7 @@
       "duration_days": null,
       "status": "active",
       "note": "Fresh key for APK test",
-      "device_id": "NEW-DEVICE-AAA-BBB-CCC",
+      "device_id": "tablet-test-555",
       "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:57:07.883Z",
@@ -262,11 +262,11 @@
       "duration_days": null,
       "status": "active",
       "note": "",
-      "device_id": null,
-      "device_info": null,
+      "device_id": "test-new-device",
+      "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T05:07:19.028Z",
-      "activated_at": null,
+      "activated_at": "2026-09-03T05:16:29.912Z",
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -563,9 +563,225 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T05:16:21.821Z"
       }
+    },
+    "device-001": {
+      "device_id": "device-001",
+      "first_seen": "2026-09-03T05:16:29.211Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.217Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.217Z"
+      }
+    },
+    "device-002": {
+      "device_id": "device-002",
+      "first_seen": "2026-09-03T05:16:29.345Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.353Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.353Z"
+      }
+    },
+    "android-abc123": {
+      "device_id": "android-abc123",
+      "first_seen": "2026-09-03T05:16:29.495Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.500Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.500Z"
+      }
+    },
+    "phone-xyz789": {
+      "device_id": "phone-xyz789",
+      "first_seen": "2026-09-03T05:16:29.646Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.652Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.652Z"
+      }
+    },
+    "tablet-test-555": {
+      "device_id": "tablet-test-555",
+      "first_seen": "2026-09-03T05:16:29.774Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.780Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.780Z"
+      }
+    },
+    "test-new-device": {
+      "device_id": "test-new-device",
+      "first_seen": "2026-09-03T05:16:29.913Z",
+      "key": "TALKPRO_3465715DFD9B596D73A95D5E",
+      "info": {},
+      "last_seen": "2026-09-03T05:16:29.923Z",
+      "key_state": {
+        "key_id": "TALKPRO_3465715DFD9B596D73A95D5E",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:16:29.923Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "test-new-device",
+      "key": "TALKPRO_3465715DFD9B596D73A95D5E",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.913Z"
+    },
+    {
+      "device_id": "tablet-test-555",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.775Z"
+    },
+    {
+      "device_id": "phone-xyz789",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.647Z"
+    },
+    {
+      "device_id": "android-abc123",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.496Z"
+    },
+    {
+      "device_id": "device-002",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.346Z"
+    },
+    {
+      "device_id": "device-001",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:16:29.212Z"
+    },
     {
       "device_id": "NEW-DEVICE-AAA-BBB-CCC",
       "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
