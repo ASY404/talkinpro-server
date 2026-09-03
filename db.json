@@ -194,9 +194,51 @@
         "planId": "premium",
         "activatedAt": "2026-09-02T19:47:33.634Z"
       }
+    },
+    "test-fresh-phone": {
+      "device_id": "test-fresh-phone",
+      "first_seen": "2026-09-03T01:41:36.457Z",
+      "key": "talkpro_fa4643e09af77b12217033e0",
+      "info": {},
+      "last_seen": "2026-09-03T01:41:36.514Z",
+      "key_state": {
+        "key_id": "talkpro_fa4643e09af77b12217033e0",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T01:41:36.514Z"
+      }
     }
   },
   "activity": [
+    {
+      "key": "talkpro_fa4643e09af77b12217033e0",
+      "type": "key_unbound",
+      "detail": "Admin unbound device — key ready for new device",
+      "at": "2026-09-03T01:41:36.818Z"
+    },
+    {
+      "device_id": "test-fresh-phone",
+      "key": "talkpro_fa4643e09af77b12217033e0",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T01:41:36.457Z"
+    },
     {
       "key": "talkpro_d35f5501bc77a5cf16261e45",
       "type": "key_unbound",
