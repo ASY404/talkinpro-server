@@ -70,11 +70,11 @@
       "duration_days": null,
       "status": "active",
       "note": "TALKPRO test keys",
-      "device_id": null,
-      "device_info": null,
+      "device_id": "test-device-001",
+      "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:05:46.775Z",
-      "activated_at": null,
+      "activated_at": "2026-09-03T04:05:52.587Z",
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -287,9 +287,45 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T01:41:36.514Z"
       }
+    },
+    "test-device-001": {
+      "device_id": "test-device-001",
+      "first_seen": "2026-09-03T04:05:52.588Z",
+      "key": "TALKPRO_989A726D2FC7A222340BB2FF",
+      "info": {},
+      "last_seen": "2026-09-03T04:05:52.696Z",
+      "key_state": {
+        "key_id": "TALKPRO_989A726D2FC7A222340BB2FF",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T04:05:52.696Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "test-device-001",
+      "key": "TALKPRO_989A726D2FC7A222340BB2FF",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T04:05:52.588Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 3 key(s) of type permanent",
