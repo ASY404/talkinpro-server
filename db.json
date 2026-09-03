@@ -207,6 +207,22 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "TALKPRO_B9A769FF594FE0956BC76F98": {
+      "key": "TALKPRO_B9A769FF594FE0956BC76F98",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "APK test key",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T04:51:18.818Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {
@@ -444,6 +460,11 @@
     }
   },
   "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 1 key(s) of type permanent",
+      "at": "2026-09-03T04:51:18.819Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 5 key(s) of type permanent",
