@@ -246,11 +246,11 @@
       "duration_days": null,
       "status": "active",
       "note": "Fresh key for APK test",
-      "device_id": "phone-user-test-002",
+      "device_id": "another-different-device-xyz",
       "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:57:07.883Z",
-      "activated_at": "2026-09-03T05:16:21.727Z",
+      "activated_at": "2026-09-03T05:22:33.736Z",
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -898,9 +898,87 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T05:21:54.373Z"
       }
+    },
+    "user-phone-final-test": {
+      "device_id": "user-phone-final-test",
+      "first_seen": "2026-09-03T05:22:33.736Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:22:33.741Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:22:33.741Z"
+      }
+    },
+    "another-different-device-xyz": {
+      "device_id": "another-different-device-xyz",
+      "first_seen": "2026-09-03T05:22:33.872Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:22:33.877Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:22:33.877Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "another-different-device-xyz",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:22:33.873Z"
+    },
+    {
+      "device_id": "user-phone-final-test",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:22:33.737Z"
+    },
+    {
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_unbound",
+      "detail": "Admin unbound device — key ready for new device",
+      "at": "2026-09-03T05:22:33.550Z"
+    },
     {
       "device_id": "fresh-test-device",
       "key": "TALKPRO_6A41253649C1644BB60D4506",
