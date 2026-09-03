@@ -1124,6 +1124,18 @@
   },
   "activity": [
     {
+      "key": "TALKPRO_C3BC808235D5925950E69023",
+      "type": "key_enabled",
+      "detail": "Admin enabled key",
+      "at": "2026-09-03T05:42:56.703Z"
+    },
+    {
+      "key": "TALKPRO_C3BC808235D5925950E69023",
+      "type": "key_disabled",
+      "detail": "Admin disabled key",
+      "at": "2026-09-03T05:42:54.937Z"
+    },
+    {
       "key": "TALKPRO_76980F4CC99AECC6ABA2B3AC",
       "type": "key_unbound",
       "detail": "Admin unbound device — key ready for new device",
