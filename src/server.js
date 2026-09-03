@@ -316,16 +316,17 @@ app.get('/v1/session/entitlement', (req, res) => {
 
   if (config.freeEntitlement) {
     // ★ ALL features enabled for everyone — no license key needed
+    // Return has_key: true and key_type: 'premium' so the app treats all users as premium
     const entitlement = {
       features: ALL_FEATURES,
       max_accounts: 100,
       max_accounts_ceiling: 100,
       voice_config: VOICE_CONFIG,
       expires_at: null,          // null = never expires
-      plan_id: 'free-unlimited',
+      plan_id: 'premium',
       device_id: deviceId,
-      has_key: false,
-      key_type: 'free',
+      has_key: true,
+      key_type: 'premium',
       checked_at: new Date().toISOString(),
     };
 
