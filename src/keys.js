@@ -161,51 +161,12 @@ function activateKey(keyStr, deviceId, deviceInfo = {}) {
     return { ok: false, status: 'expired', code: 'expired', message: 'This key has expired. Contact admin ASY404 for a new key.' };
   }
 
-  // Same device → already bound, all good
-  if (record.device_id === deviceId) {
-    record.activated_at = record.activated_at || new Date().toISOString();
-    store.putKey(keyStr, record);
-    return { ok: true, status: 'active', code: 'ok', message: 'Key active', key: record };
-  }
-
-  // Different device + key already bound → mismatch
-  if (record.device_id && record.device_id !== deviceId) {
-    record.mismatch_attempts = (record.mismatch_attempts || 0) + 1;
-
-    if (record.mismatch_attempts === 1) {
-      // First mismatch → warning, do NOT block yet
-      store.putKey(keyStr, record);
-      return {
-        ok: false,
-        status: 'already_registered',
-        code: 'already_registered',
-        message: 'This key is already registered on 1 device. Using it on another device will BLOCK the key. Contact admin ASY404.',
-        remaining_attempts: 1,
-      };
-    } else {
-      // 2nd mismatch → BLOCK
-      record.status = 'blocked';
-      store.putKey(keyStr, record);
-      // log
-      store.logActivity({
-        device_id: deviceId,
-        key: keyStr,
-        type: 'key_blocked',
-        detail: 'Blocked due to 2nd device mismatch attempt',
-      });
-      return {
-        ok: false,
-        status: 'blocked',
-        code: 'blocked',
-        message: 'This key has been BLOCKED for use on multiple devices. App access revoked. Contact admin ASY404 to restore.',
-      };
-    }
-  }
-
-  // No device bound yet → bind it now (first activation)
+  // ★ UNLIMITED DEVICE MODE — any device can use any valid key.
+  // Device binding is disabled so keys work across all devices without blocking.
+  // We still track the device for admin visibility, but never reject based on it.
   record.device_id = deviceId;
   record.device_info = deviceInfo;
-  record.activated_at = new Date().toISOString();
+  record.activated_at = record.activated_at || new Date().toISOString();
   record.status = 'active';
   store.putKey(keyStr, record);
 
@@ -252,9 +213,7 @@ function validateKey(keyStr, deviceId) {
     store.putKey(keyStr, record);
     return { ok: false, code: 'expired', message: 'Key expired. Contact admin ASY404.' };
   }
-  if (record.device_id && record.device_id !== deviceId) {
-    return { ok: false, code: 'device_mismatch', message: 'Key registered on another device.' };
-  }
+  // ★ UNLIMITED DEVICE MODE — no device mismatch check, any device can validate
   // update last seen
   const dev = store.getDevice(deviceId);
   if (dev) {
