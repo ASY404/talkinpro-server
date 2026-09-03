@@ -287,6 +287,54 @@
       "reset_count": 0,
       "reset_from": null,
       "admin": "ASY404"
+    },
+    "TALKPRO_5BD1C0653D83AAD8B81DE27A": {
+      "key": "TALKPRO_5BD1C0653D83AAD8B81DE27A",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for APK test",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T05:22:40.779Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_98FC083F04EF588088D86B16": {
+      "key": "TALKPRO_98FC083F04EF588088D86B16",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for APK test",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T05:22:40.779Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
+    },
+    "TALKPRO_CF47CCC37CC8D694213D4110": {
+      "key": "TALKPRO_CF47CCC37CC8D694213D4110",
+      "type": "permanent",
+      "duration_days": null,
+      "status": "active",
+      "note": "Delivery keys for APK test",
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
+      "created_at": "2026-09-03T05:22:40.779Z",
+      "activated_at": null,
+      "expires_at": null,
+      "reset_count": 0,
+      "reset_from": null,
+      "admin": "ASY404"
     }
   },
   "devices": {
@@ -959,6 +1007,11 @@
     }
   },
   "activity": [
+    {
+      "type": "key_created",
+      "detail": "Created 3 key(s) of type permanent",
+      "at": "2026-09-03T05:22:40.781Z"
+    },
     {
       "device_id": "another-different-device-xyz",
       "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
