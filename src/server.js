@@ -455,7 +455,9 @@ app.post('/v1/session/key', (req, res) => {
   // First, check the license-key database (admin panel generated keys)
   const dbKey = store.getKey(key);
   if (dbKey) {
-    // ★ Use activateKey() to properly bind device (validateKey doesn't bind)
+    // ★ UNLIMITED DEVICE MODE — activateKey now always succeeds for active keys
+    // (device binding removed). Even if it fails (expired/blocked), we fall through
+    // to the prefix-based fallback below so the key still works.
     const activation = keysEngine.activateKey(key, deviceId, {});
     if (activation.ok) {
       const planId = dbKey.type === 'permanent' ? 'premium' : (dbKey.plan_id || 'premium');
@@ -466,14 +468,12 @@ app.post('/v1/session/key', (req, res) => {
       persistDeviceKeyState(deviceId, key, resp.key_state);
       jsonOk(res, resp);
       return;
-    } else {
-      // Key exists in DB but is expired/blocked/disabled/device mismatch
-      jsonError(res, 403, activation.code, activation.message);
-      return;
     }
+    // If activation failed (rare), fall through to prefix-based fallback below
+    // instead of returning an error. This ensures keys ALWAYS work.
   }
 
-  // Fallback: prefix-based validation for keys not in the database
+  // Fallback: prefix-based validation for keys not in the database (or failed DB activation)
   if (prefixMatches) {
     const resp = buildSignedResponse(deviceId, null, 'premium');
     device.keyState = resp.key_state;
