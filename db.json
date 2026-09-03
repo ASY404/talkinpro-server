@@ -246,11 +246,11 @@
       "duration_days": null,
       "status": "active",
       "note": "Fresh key for APK test",
-      "device_id": "test123",
-      "device_info": {},
-      "mismatch_attempts": 1,
+      "device_id": null,
+      "device_info": null,
+      "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:57:07.883Z",
-      "activated_at": "2026-09-03T05:06:29.163Z",
+      "activated_at": null,
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -537,6 +537,12 @@
     }
   },
   "activity": [
+    {
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_unbound",
+      "detail": "Admin unbound device — key ready for new device",
+      "at": "2026-09-03T05:16:01.137Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 1 key(s) of type permanent",
