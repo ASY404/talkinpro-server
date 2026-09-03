@@ -245,11 +245,11 @@
     "bcf4a8a24fde69511f06e572d436c229": {
       "device_id": "bcf4a8a24fde69511f06e572d436c229",
       "first_seen": "2026-09-02T18:58:57.795Z",
-      "key": "TALKPRO_6B942AD4E6C39874E109F4AC",
+      "key": "TALKPRO_6834240E6C9978181DFF4AC",
       "info": {},
-      "last_seen": "2026-09-03T04:51:46.256Z",
+      "last_seen": "2026-09-03T04:57:01.186Z",
       "key_state": {
-        "key_id": "TALKPRO_6B942AD4E6C39874E109F4AC",
+        "key_id": "TALKPRO_6834240E6C9978181DFF4AC",
         "state": "active",
         "maxAccounts": 100,
         "features": {
@@ -268,7 +268,7 @@
         },
         "expiresAt": null,
         "planId": "premium",
-        "activatedAt": "2026-09-03T04:51:46.256Z"
+        "activatedAt": "2026-09-03T04:57:01.185Z"
       }
     },
     "sig-test-device": {
