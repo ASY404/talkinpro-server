@@ -35,7 +35,7 @@ const config = {
   signingSecret: required('APP_SIGNING_SECRET', ''),
   entitlementPublicKeyHex: required('ENTITLEMENT_PUBLIC_KEY_HEX', ''),
   entitlementPrivateKeyHex: required('ENTITLEMENT_PRIVATE_KEY_HEX', ''),
-  keyPrefix: 'talkpro_', // Hardcoded — always talkpro_ (matches app bundle prefix)
+  keyPrefix: 'TALKPRO_', // Hardcoded — ALL CAPS prefix (matches patched app bundle)
   freeEntitlement: (process.env.FREE_ENTITLEMENT || 'true').toLowerCase() === 'true',
 
   // Agora

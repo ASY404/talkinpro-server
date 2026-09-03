@@ -29,13 +29,13 @@
 const crypto = require('crypto');
 const store = require('./store');
 
-const KEY_PREFIX = 'talkpro_'; // Hardcoded — always generate talkpro_ keys (matches app bundle)
+const KEY_PREFIX = 'TALKPRO_'; // Hardcoded — ALL CAPS prefix (matches patched app bundle)
 
 // ---------- Key generation ----------
 
 function generateKeyString() {
-  // 24 random hex chars → readable but unique
-  const rand = crypto.randomBytes(12).toString('hex');
+  // 24 random hex chars in UPPERCASE → ALL CAPS key format: TALKPRO_ + uppercase hex
+  const rand = crypto.randomBytes(12).toString('hex').toUpperCase();
   return `${KEY_PREFIX}${rand}`;
 }
 

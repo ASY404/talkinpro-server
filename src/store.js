@@ -231,7 +231,8 @@ function save() {
 
 function getKey(keyStr) {
   const db = load();
-  return db.keys[keyStr] || null;
+  // Try exact match first, then uppercase (case-insensitive fallback for ALL CAPS key system)
+  return db.keys[keyStr] || db.keys[(keyStr || '').toUpperCase()] || null;
 }
 
 function putKey(keyStr, record) {
