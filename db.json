@@ -247,7 +247,7 @@
       "first_seen": "2026-09-02T18:58:57.795Z",
       "key": "TALKPRO_6B942AD4E6C39874E109F4AC",
       "info": {},
-      "last_seen": "2026-09-03T04:51:41.801Z",
+      "last_seen": "2026-09-03T04:51:46.256Z",
       "key_state": {
         "key_id": "TALKPRO_6B942AD4E6C39874E109F4AC",
         "state": "active",
@@ -268,7 +268,7 @@
         },
         "expiresAt": null,
         "planId": "premium",
-        "activatedAt": "2026-09-03T04:51:41.801Z"
+        "activatedAt": "2026-09-03T04:51:46.256Z"
       }
     },
     "sig-test-device": {
