@@ -246,11 +246,11 @@
       "duration_days": null,
       "status": "active",
       "note": "Fresh key for APK test",
-      "device_id": null,
-      "device_info": null,
+      "device_id": "test123",
+      "device_info": {},
       "mismatch_attempts": 0,
       "created_at": "2026-09-03T04:57:07.883Z",
-      "activated_at": null,
+      "activated_at": "2026-09-03T05:06:29.163Z",
       "expires_at": null,
       "reset_count": 0,
       "reset_from": null,
@@ -489,9 +489,45 @@
         "planId": "premium",
         "activatedAt": "2026-09-03T04:06:38.423Z"
       }
+    },
+    "test123": {
+      "device_id": "test123",
+      "first_seen": "2026-09-03T05:06:29.164Z",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "info": {},
+      "last_seen": "2026-09-03T05:06:29.170Z",
+      "key_state": {
+        "key_id": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+        "state": "active",
+        "maxAccounts": 100,
+        "features": {
+          "prank": true,
+          "boost": true,
+          "antidelete": true,
+          "antimicmute": true,
+          "antimicremove": true,
+          "antivoiceroomleave": true,
+          "isvoiceeffect": true,
+          "issoundbox": true,
+          "isimgprank": true,
+          "isstickerprank": true,
+          "ismusicbot": true,
+          "isantiban": true
+        },
+        "expiresAt": null,
+        "planId": "premium",
+        "activatedAt": "2026-09-03T05:06:29.170Z"
+      }
     }
   },
   "activity": [
+    {
+      "device_id": "test123",
+      "key": "TALKPRO_59C83AF7D9CDB78FCAC47A47",
+      "type": "key_activated",
+      "detail": "Key activated on device",
+      "at": "2026-09-03T05:06:29.165Z"
+    },
     {
       "type": "key_created",
       "detail": "Created 1 key(s) of type permanent",
